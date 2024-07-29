@@ -34,7 +34,7 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project explores parametric **Accelerated Failure Time** models with **No Penalty**, **Full L1 Penalty**, **Full L2 Penalty**, **Equal L1|L2 Penalties** and **Weighted L1|L2 Penalties** using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark> to estimate the survival probabilities of right-censored survival time and status responses. The resulting predictions derived from the candidate models were evaluated in terms of their discrimination power using the Harrel's concordance index metric. Additionally, feature impact on model output were estimated using **Shapley Additive Explanations**. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document. 
+This project explores parametric **Accelerated Failure Time** models with error distributions following the **Weibull**, **Normal** and **Log-Logistic** distributions using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark> to analyze time-to-event data by directly modelling  the time until an event of interest occurs. The resulting predictions derived from the candidate models were evaluated in terms of their discrimination power using the Harrel's concordance index metric. The resulting predictions derived from the candidate models were evaluated in terms of their model fit using the brier score, mean squared error (MSE) and mean absolute error (MAE) metrics. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document. 
 
 [Survival Analysis](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) deals with the analysis of time-to-event data. It focuses on the expected duration of time until one or more events of interest occur, such as death, failure, or relapse. This type of analysis is used to study and model the time until the occurrence of an event, taking into account that the event might not have occurred for all subjects during the study period. Several key aspects of survival analysis include the survival function which refers to the probability that an individual survives longer than a certain time, hazard function which describes the instantaneous rate at which events occur, given no prior event, and censoring pertaining to a condition where the event of interest has not occurred for some subjects during the observation period.
 
@@ -133,7 +133,10 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 from scipy import stats
 from scipy.stats import ttest_ind, chi2_contingency
 
-from lifelines import KaplanMeierFitter, CoxPHFitter
+from lifelines import KaplanMeierFitter
+from lifelines.fitters.weibull_aft_fitter import WeibullAFTFitter
+from lifelines.fitters.log_normal_aft_fitter import LogNormalAFTFitter
+from lifelines.fitters.log_logistic_aft_fitter import LogLogisticAFTFitter
 from lifelines.utils import concordance_index
 from lifelines.statistics import logrank_test
 import shap
@@ -7557,7 +7560,429 @@ cirrhosis_survival_test_modeling.head()
 
 [Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) are a class of survival analysis models used to analyze time-to-event data by directly modelling the survival time itself. An AFT model assumes that the effect of covariates accelerates or decelerates the life time of an event by some constant factor. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a random variable with a specified distribution. In an AFT model, the coefficients represent the multiplicative effect on the survival time. An exponentiated regression coefficient greater than one prolongs survival time, while a value less than one shortens it. The scale parameter determines the spread or variability of survival times. AFT models assume that the effect of covariates on survival time is multiplicative and that the survival times can be transformed to follow a specific distribution.
 
-[Weibull Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival times follow a Weibull distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a Weibull-distributed error term. This model is flexible as it can model both increasing and decreasing hazard rates over time and can be used to model various types of survival data. However, the results may be complex to interpret if the shape parameter does not align well with the data, and the model can also be sensitive to the distributional assumptions.
+[Weibull Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival time errors follow a Weibull distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a Weibull-distributed error term. This model is flexible as it can model both increasing and decreasing hazard rates over time and can be used to model various types of survival data. However, the results may be complex to interpret if the shape parameter does not align well with the data, and the model can also be sensitive to the distributional assumptions.
+
+
+
+```python
+##################################
+# Formulating the Accelerated Failure Time model
+# based on a Weibull distribution
+# with Equal L1 and l2 Penalty
+# and generating the summary
+##################################
+cirrhosis_survival_aft_weibull = WeibullAFTFitter(penalizer=0.10, l1_ratio=0.50)
+cirrhosis_survival_aft_weibull.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_weibull.print_summary()
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>model</th>
+      <td>lifelines.WeibullAFTFitter</td>
+    </tr>
+    <tr>
+      <th>duration col</th>
+      <td>'N_Days'</td>
+    </tr>
+    <tr>
+      <th>event col</th>
+      <td>'Status'</td>
+    </tr>
+    <tr>
+      <th>penalizer</th>
+      <td>0.1</td>
+    </tr>
+    <tr>
+      <th>number of observations</th>
+      <td>218</td>
+    </tr>
+    <tr>
+      <th>number of events observed</th>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>log-likelihood</th>
+      <td>-786.13</td>
+    </tr>
+    <tr>
+      <th>time fit was run</th>
+      <td>2024-07-29 09:04:43 UTC</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;">coef</th>
+      <th style="min-width: 12px;">exp(coef)</th>
+      <th style="min-width: 12px;">se(coef)</th>
+      <th style="min-width: 12px;">coef lower 95%</th>
+      <th style="min-width: 12px;">coef upper 95%</th>
+      <th style="min-width: 12px;">exp(coef) lower 95%</th>
+      <th style="min-width: 12px;">exp(coef) upper 95%</th>
+      <th style="min-width: 12px;">cmp to</th>
+      <th style="min-width: 12px;">z</th>
+      <th style="min-width: 12px;">p</th>
+      <th style="min-width: 12px;">-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="18" valign="top">lambda_</th>
+      <th>Age</th>
+      <td>-0.15</td>
+      <td>0.86</td>
+      <td>0.08</td>
+      <td>-0.30</td>
+      <td>0.01</td>
+      <td>0.74</td>
+      <td>1.01</td>
+      <td>0.00</td>
+      <td>-1.85</td>
+      <td>0.06</td>
+      <td>3.95</td>
+    </tr>
+    <tr>
+      <th>Albumin</th>
+      <td>0.07</td>
+      <td>1.08</td>
+      <td>0.09</td>
+      <td>-0.10</td>
+      <td>0.25</td>
+      <td>0.90</td>
+      <td>1.28</td>
+      <td>0.00</td>
+      <td>0.82</td>
+      <td>0.41</td>
+      <td>1.27</td>
+    </tr>
+    <tr>
+      <th>Alk_Phos</th>
+      <td>-0.00</td>
+      <td>1.00</td>
+      <td>0.09</td>
+      <td>-0.17</td>
+      <td>0.17</td>
+      <td>0.84</td>
+      <td>1.18</td>
+      <td>0.00</td>
+      <td>-0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Ascites</th>
+      <td>-0.10</td>
+      <td>0.90</td>
+      <td>0.26</td>
+      <td>-0.60</td>
+      <td>0.40</td>
+      <td>0.55</td>
+      <td>1.49</td>
+      <td>0.00</td>
+      <td>-0.40</td>
+      <td>0.69</td>
+      <td>0.54</td>
+    </tr>
+    <tr>
+      <th>Bilirubin</th>
+      <td>-0.46</td>
+      <td>0.63</td>
+      <td>0.12</td>
+      <td>-0.69</td>
+      <td>-0.23</td>
+      <td>0.50</td>
+      <td>0.80</td>
+      <td>0.00</td>
+      <td>-3.87</td>
+      <td>&lt;0.005</td>
+      <td>13.18</td>
+    </tr>
+    <tr>
+      <th>Cholesterol</th>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.09</td>
+      <td>-0.18</td>
+      <td>0.18</td>
+      <td>0.83</td>
+      <td>1.20</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Copper</th>
+      <td>-0.08</td>
+      <td>0.93</td>
+      <td>0.10</td>
+      <td>-0.26</td>
+      <td>0.11</td>
+      <td>0.77</td>
+      <td>1.12</td>
+      <td>0.00</td>
+      <td>-0.79</td>
+      <td>0.43</td>
+      <td>1.22</td>
+    </tr>
+    <tr>
+      <th>Drug</th>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.15</td>
+      <td>-0.29</td>
+      <td>0.29</td>
+      <td>0.74</td>
+      <td>1.34</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Edema</th>
+      <td>-0.27</td>
+      <td>0.76</td>
+      <td>0.20</td>
+      <td>-0.65</td>
+      <td>0.11</td>
+      <td>0.52</td>
+      <td>1.12</td>
+      <td>0.00</td>
+      <td>-1.39</td>
+      <td>0.17</td>
+      <td>2.59</td>
+    </tr>
+    <tr>
+      <th>Hepatomegaly</th>
+      <td>-0.00</td>
+      <td>1.00</td>
+      <td>0.17</td>
+      <td>-0.34</td>
+      <td>0.33</td>
+      <td>0.71</td>
+      <td>1.39</td>
+      <td>0.00</td>
+      <td>-0.01</td>
+      <td>0.99</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <th>Platelets</th>
+      <td>0.01</td>
+      <td>1.01</td>
+      <td>0.08</td>
+      <td>-0.15</td>
+      <td>0.16</td>
+      <td>0.86</td>
+      <td>1.17</td>
+      <td>0.00</td>
+      <td>0.07</td>
+      <td>0.94</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <th>Prothrombin</th>
+      <td>-0.19</td>
+      <td>0.83</td>
+      <td>0.09</td>
+      <td>-0.36</td>
+      <td>-0.02</td>
+      <td>0.70</td>
+      <td>0.98</td>
+      <td>0.00</td>
+      <td>-2.23</td>
+      <td>0.03</td>
+      <td>5.28</td>
+    </tr>
+    <tr>
+      <th>SGOT</th>
+      <td>-0.05</td>
+      <td>0.95</td>
+      <td>0.09</td>
+      <td>-0.23</td>
+      <td>0.13</td>
+      <td>0.80</td>
+      <td>1.14</td>
+      <td>0.00</td>
+      <td>-0.54</td>
+      <td>0.59</td>
+      <td>0.76</td>
+    </tr>
+    <tr>
+      <th>Sex</th>
+      <td>-0.00</td>
+      <td>1.00</td>
+      <td>0.22</td>
+      <td>-0.43</td>
+      <td>0.43</td>
+      <td>0.65</td>
+      <td>1.53</td>
+      <td>0.00</td>
+      <td>-0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Spiders</th>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.18</td>
+      <td>-0.34</td>
+      <td>0.34</td>
+      <td>0.71</td>
+      <td>1.41</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Stage_4.0</th>
+      <td>-0.11</td>
+      <td>0.90</td>
+      <td>0.18</td>
+      <td>-0.47</td>
+      <td>0.25</td>
+      <td>0.63</td>
+      <td>1.29</td>
+      <td>0.00</td>
+      <td>-0.58</td>
+      <td>0.56</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <th>Tryglicerides</th>
+      <td>-0.04</td>
+      <td>0.96</td>
+      <td>0.08</td>
+      <td>-0.21</td>
+      <td>0.12</td>
+      <td>0.81</td>
+      <td>1.13</td>
+      <td>0.00</td>
+      <td>-0.53</td>
+      <td>0.59</td>
+      <td>0.75</td>
+    </tr>
+    <tr>
+      <th>Intercept</th>
+      <td>8.42</td>
+      <td>4558.93</td>
+      <td>0.23</td>
+      <td>7.97</td>
+      <td>8.88</td>
+      <td>2904.58</td>
+      <td>7155.54</td>
+      <td>0.00</td>
+      <td>36.63</td>
+      <td>&lt;0.005</td>
+      <td>973.35</td>
+    </tr>
+    <tr>
+      <th>rho_</th>
+      <th>Intercept</th>
+      <td>0.43</td>
+      <td>1.53</td>
+      <td>0.09</td>
+      <td>0.26</td>
+      <td>0.60</td>
+      <td>1.29</td>
+      <td>1.82</td>
+      <td>0.00</td>
+      <td>4.93</td>
+      <td>&lt;0.005</td>
+      <td>20.21</td>
+    </tr>
+  </tbody>
+</table><br><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>Concordance</th>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <th>AIC</th>
+      <td>1610.26</td>
+    </tr>
+    <tr>
+      <th>log-likelihood ratio test</th>
+      <td>85.20 on 17 df</td>
+    </tr>
+    <tr>
+      <th>-log2(p) of ll-ratio test</th>
+      <td>34.37</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting the log accelerated failure rate of the
+# formulated Accelerated Failure Time model
+# based on a Weibull distribution
+# with Equal L1 and l2 Penalty
+##################################
+cirrhosis_survival_aft_weibull_summary = cirrhosis_survival_aft_weibull.summary
+cirrhosis_survival_aft_weibull_summary_params = pd.DataFrame(cirrhosis_survival_aft_weibull.params_)
+significant = cirrhosis_survival_aft_weibull_summary['p'] < 0.05
+cirrhosis_survival_aft_weibull_summary_log_accelerated_failure_rate = (list(cirrhosis_survival_aft_weibull_summary_params.iloc[:,0].values))
+plt.figure(figsize=(17, 8))
+colors = ['#993300' if sig else '#CC9966' for sig in significant]
+
+plt.barh([(index[0] + index[1]) for index in cirrhosis_survival_aft_weibull_summary_params.index[0:17]], 
+         cirrhosis_survival_aft_weibull_summary_log_accelerated_failure_rate[0:17], 
+         xerr=cirrhosis_survival_aft_weibull_summary['se(coef)'][0:17], 
+         color=colors)
+plt.xlabel('Log(Accelerated Failure Rate)')
+plt.ylabel('Variables')
+plt.title('AFT_WEIBULL Log(Accelerated Failure Rate) Forest Plot')
+plt.axvline(x=0, color='k', linestyle='--')
+plt.gca().invert_yaxis()
+plt.show()
+```
+
+
+    
+![png](output_163_0.png)
+    
 
 
 ### 1.6.3 Log-Normal Accelerated Failure Time Model <a class="anchor" id="1.6.3"></a>
@@ -7568,7 +7993,7 @@ cirrhosis_survival_test_modeling.head()
 
 [Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) are a class of survival analysis models used to analyze time-to-event data by directly modelling the survival time itself. An AFT model assumes that the effect of covariates accelerates or decelerates the life time of an event by some constant factor. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a random variable with a specified distribution. In an AFT model, the coefficients represent the multiplicative effect on the survival time. An exponentiated regression coefficient greater than one prolongs survival time, while a value less than one shortens it. The scale parameter determines the spread or variability of survival times. AFT models assume that the effect of covariates on survival time is multiplicative and that the survival times can be transformed to follow a specific distribution.
 
-[Log-Normal Accelerated Failure Time Model](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the logarithm of survival times follows a normal distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a standard normal error term. This model can be a good fit for data with a log-normal distribution, with well-established statistical properties and straightforward interpretation on the log scale. However, the model can have limited flexibility in hazard rate shapes compared to the Weibull model and can be less intuitive to interpret on the original time scale.
+[Log-Normal Accelerated Failure Time Model](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the logarithm of survival time errors follows a normal distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a standard normal error term. This model can be a good fit for data with a log-normal distribution, with well-established statistical properties and straightforward interpretation on the log scale. However, the model can have limited flexibility in hazard rate shapes compared to the Weibull model and can be less intuitive to interpret on the original time scale.
 
 
 ### 1.6.4 Log-Logistic Accelerated Failure Time Model <a class="anchor" id="1.6.4"></a>
@@ -7579,7 +8004,7 @@ cirrhosis_survival_test_modeling.head()
 
 [Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) are a class of survival analysis models used to analyze time-to-event data by directly modelling the survival time itself. An AFT model assumes that the effect of covariates accelerates or decelerates the life time of an event by some constant factor. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a random variable with a specified distribution. In an AFT model, the coefficients represent the multiplicative effect on the survival time. An exponentiated regression coefficient greater than one prolongs survival time, while a value less than one shortens it. The scale parameter determines the spread or variability of survival times. AFT models assume that the effect of covariates on survival time is multiplicative and that the survival times can be transformed to follow a specific distribution.
 
-[Log-Logistic Accelerated Failure Time Model](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival times follow a log-logistic distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a standard logistic error term. This model can estimate various hazard shapes, including non-monotonic hazard functions and may be more flexible than the Log Normal model. However, interpretation of results can be complex due to the nature of the logistic distribution and the model structure may be less robust to outliers compared to other models.
+[Log-Logistic Accelerated Failure Time Model](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival time errors follow a log-logistic distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a standard logistic error term. This model can estimate various hazard shapes, including non-monotonic hazard functions and may be more flexible than the Log Normal model. However, interpretation of results can be complex due to the nature of the logistic distribution and the model structure may be less robust to outliers compared to other models.
 
 
 ## 1.7. Consolidated Findings <a class="anchor" id="1.7"></a>
