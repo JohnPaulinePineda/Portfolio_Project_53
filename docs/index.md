@@ -34,7 +34,7 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project explores parametric **Accelerated Failure Time** models with error distributions following the **Weibull**, **Normal** and **Log-Logistic** distributions using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark> to analyze time-to-event data by directly modelling  the time until an event of interest occurs. The resulting predictions derived from the candidate models were evaluated in terms of their discrimination power using the Harrel's concordance index metric, and their model fit using the brier score and mean absolute error (MAE) metrics. Additionally, feature impact on model output were estimated using **Shapley Additive Explanations**. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document. 
+This project explores parametric **Accelerated Failure Time** models with error distributions following the **Weibull**, **Log-Normal** and **Log-Logistic** distributions using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark> to analyze time-to-event data by directly modelling  the time until an event of interest occurs. The resulting predictions derived from the candidate models were evaluated in terms of their discrimination power using the Harrel's concordance index metric, and their model fit using the brier score and mean absolute error (MAE) metrics. Additionally, feature impact on model output were estimated using **Shapley Additive Explanations**. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document. 
 
 [Survival Analysis](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) deals with the analysis of time-to-event data. It focuses on the expected duration of time until one or more events of interest occur, such as death, failure, or relapse. This type of analysis is used to study and model the time until the occurrence of an event, taking into account that the event might not have occurred for all subjects during the study period. Several key aspects of survival analysis include the survival function which refers to the probability that an individual survives longer than a certain time, hazard function which describes the instantaneous rate at which events occur, given no prior event, and censoring pertaining to a condition where the event of interest has not occurred for some subjects during the observation period.
 
@@ -7648,7 +7648,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-30 08:28:03 UTC</td>
+      <td>2024-07-30 13:49:26 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8141,19 +8141,27 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_test_brier}")
 
 ```python
 ##################################
-# Gathering the concordance indices
+# Gathering the model performance metrics
 # from training, cross-validation and test
 ##################################
-coxph_aft_weibull_set = pd.DataFrame(["Train","Cross-Validation","Test"])
-coxph_aft_weibull_ci_values = pd.DataFrame([cirrhosis_survival_aft_weibull_train_ci,
+coxph_aft_weibull_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
+coxph_aft_weibull_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
+coxph_aft_weibull_metric_values = pd.DataFrame([cirrhosis_survival_aft_weibull_train_ci,
                                            cirrhosis_survival_aft_weibull_cv_ci_mean,
-                                           cirrhosis_survival_aft_weibull_test_ci])
-coxph_aft_weibull_method = pd.DataFrame(["AFT_WEIBULL"]*3)
-coxph_aft_weibull_summary = pd.concat([coxph_aft_weibull_set, 
-                                       coxph_aft_weibull_ci_values,
+                                           cirrhosis_survival_aft_weibull_test_ci,
+                                           cirrhosis_survival_aft_weibull_train_mae,
+                                           cirrhosis_survival_aft_weibull_cv_mae_mean,
+                                           cirrhosis_survival_aft_weibull_test_mae,
+                                           cirrhosis_survival_aft_weibull_train_brier,
+                                           cirrhosis_survival_aft_weibull_cv_brier_mean,
+                                           cirrhosis_survival_aft_weibull_test_brier])
+coxph_aft_weibull_method = pd.DataFrame(["AFT_WEIBULL"]*9)
+coxph_aft_weibull_summary = pd.concat([coxph_aft_weibull_set,
+                                       coxph_aft_weibull_metric,
+                                       coxph_aft_weibull_metric_values,
                                        coxph_aft_weibull_method], 
                                       axis=1)
-coxph_aft_weibull_summary.columns = ['Set', 'Concordance.Index', 'Method']
+coxph_aft_weibull_summary.columns = ['Set', 'Metric', 'Value', 'Method']
 coxph_aft_weibull_summary.reset_index(inplace=True, drop=True)
 display(coxph_aft_weibull_summary)
 ```
@@ -8178,7 +8186,8 @@ display(coxph_aft_weibull_summary)
     <tr style="text-align: right;">
       <th></th>
       <th>Set</th>
-      <th>Concordance.Index</th>
+      <th>Metric</th>
+      <th>Value</th>
       <th>Method</th>
     </tr>
   </thead>
@@ -8186,19 +8195,64 @@ display(coxph_aft_weibull_summary)
     <tr>
       <th>0</th>
       <td>Train</td>
+      <td>Concordance.Index</td>
       <td>0.852568</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Cross-Validation</td>
+      <td>Concordance.Index</td>
       <td>0.812420</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Test</td>
+      <td>Concordance.Index</td>
       <td>0.870295</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Train</td>
+      <td>MAE</td>
+      <td>2805.613055</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Cross-Validation</td>
+      <td>MAE</td>
+      <td>2931.480822</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Test</td>
+      <td>MAE</td>
+      <td>2211.590299</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Train</td>
+      <td>Brier.Score</td>
+      <td>0.542714</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Cross-Validation</td>
+      <td>Brier.Score</td>
+      <td>0.534748</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Test</td>
+      <td>Brier.Score</td>
+      <td>0.571367</td>
       <td>AFT_WEIBULL</td>
     </tr>
   </tbody>
@@ -8226,6 +8280,58 @@ plt.show()
 
     
 ![png](output_170_0.png)
+    
+
+
+
+```python
+cirrhosis_survival_train_modeling.columns
+```
+
+
+
+
+    Index(['Status', 'N_Days', 'Age', 'Bilirubin', 'Cholesterol', 'Albumin',
+           'Copper', 'Alk_Phos', 'SGOT', 'Tryglicerides', 'Platelets',
+           'Prothrombin', 'Drug', 'Sex', 'Ascites', 'Hepatomegaly', 'Spiders',
+           'Edema', 'Stage_4.0'],
+          dtype='object')
+
+
+
+
+```python
+##################################
+# Defining a prediction function
+# for SHAP value estimation
+##################################
+def aft_predict(fitter, df):
+    return fitter.predict_expectation(df)
+
+##################################
+# Creating the explainer object
+##################################
+explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_weibull, 
+                                                         pd.DataFrame(x, columns=cirrhosis_survival_train_modeling.columns[2:])), 
+                                   cirrhosis_survival_train_modeling.iloc[:, 2:])
+shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
+```
+
+    PermutationExplainer explainer: 219it [00:31,  5.44it/s]                         
+    
+
+
+```python
+##################################
+# Plotting the SHAP summary plot
+##################################
+shap.summary_plot(shap_values_weibull, 
+                  cirrhosis_survival_train_modeling.iloc[:, 2:])
+```
+
+
+    
+![png](output_173_0.png)
     
 
 
@@ -8258,7 +8364,7 @@ plt.show()
 
 
     
-![png](output_172_0.png)
+![png](output_175_0.png)
     
 
 
@@ -8321,7 +8427,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-30 08:28:09 UTC</td>
+      <td>2024-07-30 13:50:02 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8678,7 +8784,7 @@ plt.show()
 
 
     
-![png](output_174_0.png)
+![png](output_177_0.png)
     
 
 
@@ -8813,21 +8919,30 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_test_brier}")
 
 ```python
 ##################################
-# Gathering the concordance indices
+# Gathering the model performance metrics
 # from training, cross-validation and test
 ##################################
-coxph_aft_lognormal_set = pd.DataFrame(["Train","Cross-Validation","Test"])
-coxph_aft_lognormal_ci_values = pd.DataFrame([cirrhosis_survival_aft_lognormal_train_ci,
+coxph_aft_lognormal_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
+coxph_aft_lognormal_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
+coxph_aft_lognormal_metric_values = pd.DataFrame([cirrhosis_survival_aft_lognormal_train_ci,
                                            cirrhosis_survival_aft_lognormal_cv_ci_mean,
-                                           cirrhosis_survival_aft_lognormal_test_ci])
-coxph_aft_lognormal_method = pd.DataFrame(["AFT_LOGNORMAL"]*3)
-coxph_aft_lognormal_summary = pd.concat([coxph_aft_lognormal_set, 
-                                       coxph_aft_lognormal_ci_values,
+                                           cirrhosis_survival_aft_lognormal_test_ci,
+                                           cirrhosis_survival_aft_lognormal_train_mae,
+                                           cirrhosis_survival_aft_lognormal_cv_mae_mean,
+                                           cirrhosis_survival_aft_lognormal_test_mae,
+                                           cirrhosis_survival_aft_lognormal_train_brier,
+                                           cirrhosis_survival_aft_lognormal_cv_brier_mean,
+                                           cirrhosis_survival_aft_lognormal_test_brier])
+coxph_aft_lognormal_method = pd.DataFrame(["AFT_LOGNORMAL"]*9)
+coxph_aft_lognormal_summary = pd.concat([coxph_aft_lognormal_set,
+                                       coxph_aft_lognormal_metric,
+                                       coxph_aft_lognormal_metric_values,
                                        coxph_aft_lognormal_method], 
                                       axis=1)
-coxph_aft_lognormal_summary.columns = ['Set', 'Concordance.Index', 'Method']
+coxph_aft_lognormal_summary.columns = ['Set', 'Metric', 'Value', 'Method']
 coxph_aft_lognormal_summary.reset_index(inplace=True, drop=True)
 display(coxph_aft_lognormal_summary)
+
 ```
 
 
@@ -8850,7 +8965,8 @@ display(coxph_aft_lognormal_summary)
     <tr style="text-align: right;">
       <th></th>
       <th>Set</th>
-      <th>Concordance.Index</th>
+      <th>Metric</th>
+      <th>Value</th>
       <th>Method</th>
     </tr>
   </thead>
@@ -8858,19 +8974,64 @@ display(coxph_aft_lognormal_summary)
     <tr>
       <th>0</th>
       <td>Train</td>
+      <td>Concordance.Index</td>
       <td>0.852812</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Cross-Validation</td>
+      <td>Concordance.Index</td>
       <td>0.813241</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Test</td>
+      <td>Concordance.Index</td>
       <td>0.877551</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Train</td>
+      <td>MAE</td>
+      <td>2743.628741</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Cross-Validation</td>
+      <td>MAE</td>
+      <td>2798.348657</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Test</td>
+      <td>MAE</td>
+      <td>2017.418360</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Train</td>
+      <td>Brier.Score</td>
+      <td>0.564458</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Cross-Validation</td>
+      <td>Brier.Score</td>
+      <td>0.555337</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Test</td>
+      <td>Brier.Score</td>
+      <td>0.599629</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
   </tbody>
@@ -8897,7 +9058,44 @@ plt.show()
 
 
     
-![png](output_180_0.png)
+![png](output_183_0.png)
+    
+
+
+
+```python
+##################################
+# Defining a prediction function
+# for SHAP value estimation
+##################################
+def aft_predict(fitter, df):
+    return fitter.predict_expectation(df)
+
+##################################
+# Creating the explainer object
+##################################
+explainer_lognormal = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_lognormal, 
+                                                         pd.DataFrame(x, columns=cirrhosis_survival_train_modeling.columns[2:])), 
+                                   cirrhosis_survival_train_modeling.iloc[:, 2:])
+shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.iloc[:, 2:])
+
+```
+
+    PermutationExplainer explainer: 219it [00:25,  4.74it/s]                         
+    
+
+
+```python
+##################################
+# Plotting the SHAP summary plot
+##################################
+shap.summary_plot(shap_values_lognormal, 
+                  cirrhosis_survival_train_modeling.iloc[:, 2:])
+```
+
+
+    
+![png](output_185_0.png)
     
 
 
@@ -8930,7 +9128,7 @@ plt.show()
 
 
     
-![png](output_182_0.png)
+![png](output_187_0.png)
     
 
 
@@ -8993,7 +9191,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-30 08:28:16 UTC</td>
+      <td>2024-07-30 13:50:33 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9351,7 +9549,7 @@ plt.show()
 
 
     
-![png](output_184_0.png)
+![png](output_189_0.png)
     
 
 
@@ -9486,19 +9684,27 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_test_brier}"
 
 ```python
 ##################################
-# Gathering the concordance indices
+# Gathering the model performance metrics
 # from training, cross-validation and test
 ##################################
-coxph_aft_loglogistic_set = pd.DataFrame(["Train","Cross-Validation","Test"])
-coxph_aft_loglogistic_ci_values = pd.DataFrame([cirrhosis_survival_aft_loglogistic_train_ci,
+coxph_aft_loglogistic_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
+coxph_aft_loglogistic_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
+coxph_aft_loglogistic_metric_values = pd.DataFrame([cirrhosis_survival_aft_loglogistic_train_ci,
                                            cirrhosis_survival_aft_loglogistic_cv_ci_mean,
-                                           cirrhosis_survival_aft_loglogistic_test_ci])
-coxph_aft_loglogistic_method = pd.DataFrame(["AFT_LOGLOGISTIC"]*3)
-coxph_aft_loglogistic_summary = pd.concat([coxph_aft_loglogistic_set, 
-                                       coxph_aft_loglogistic_ci_values,
+                                           cirrhosis_survival_aft_loglogistic_test_ci,
+                                           cirrhosis_survival_aft_loglogistic_train_mae,
+                                           cirrhosis_survival_aft_loglogistic_cv_mae_mean,
+                                           cirrhosis_survival_aft_loglogistic_test_mae,
+                                           cirrhosis_survival_aft_loglogistic_train_brier,
+                                           cirrhosis_survival_aft_loglogistic_cv_brier_mean,
+                                           cirrhosis_survival_aft_loglogistic_test_brier])
+coxph_aft_loglogistic_method = pd.DataFrame(["AFT_LOGLOGISTIC"]*9)
+coxph_aft_loglogistic_summary = pd.concat([coxph_aft_loglogistic_set,
+                                       coxph_aft_loglogistic_metric,
+                                       coxph_aft_loglogistic_metric_values,
                                        coxph_aft_loglogistic_method], 
                                       axis=1)
-coxph_aft_loglogistic_summary.columns = ['Set', 'Concordance.Index', 'Method']
+coxph_aft_loglogistic_summary.columns = ['Set', 'Metric', 'Value', 'Method']
 coxph_aft_loglogistic_summary.reset_index(inplace=True, drop=True)
 display(coxph_aft_loglogistic_summary)
 ```
@@ -9523,7 +9729,8 @@ display(coxph_aft_loglogistic_summary)
     <tr style="text-align: right;">
       <th></th>
       <th>Set</th>
-      <th>Concordance.Index</th>
+      <th>Metric</th>
+      <th>Value</th>
       <th>Method</th>
     </tr>
   </thead>
@@ -9531,19 +9738,64 @@ display(coxph_aft_loglogistic_summary)
     <tr>
       <th>0</th>
       <td>Train</td>
+      <td>Concordance.Index</td>
       <td>0.855169</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Cross-Validation</td>
+      <td>Concordance.Index</td>
       <td>0.819981</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Test</td>
+      <td>Concordance.Index</td>
       <td>0.880272</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Train</td>
+      <td>MAE</td>
+      <td>3219.265806</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Cross-Validation</td>
+      <td>MAE</td>
+      <td>3286.319389</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Test</td>
+      <td>MAE</td>
+      <td>2388.701356</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Train</td>
+      <td>Brier.Score</td>
+      <td>0.543404</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Cross-Validation</td>
+      <td>Brier.Score</td>
+      <td>0.535382</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Test</td>
+      <td>Brier.Score</td>
+      <td>0.571244</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
   </tbody>
@@ -9570,7 +9822,43 @@ plt.show()
 
 
     
-![png](output_190_0.png)
+![png](output_195_0.png)
+    
+
+
+
+```python
+##################################
+# Defining a prediction function
+# for SHAP value estimation
+##################################
+def aft_predict(fitter, df):
+    return fitter.predict_expectation(df)
+
+##################################
+# Creating the explainer object
+##################################
+explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_loglogistic, 
+                                                         pd.DataFrame(x, columns=cirrhosis_survival_train_modeling.columns[2:])), 
+                                   cirrhosis_survival_train_modeling.iloc[:, 2:])
+shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
+```
+
+    PermutationExplainer explainer: 219it [00:24,  5.32it/s]                         
+    
+
+
+```python
+##################################
+# Plotting the SHAP summary plot
+##################################
+shap.summary_plot(shap_values_loglogistic, 
+                  cirrhosis_survival_train_modeling.iloc[:, 2:])
+```
+
+
+    
+![png](output_197_0.png)
     
 
 
