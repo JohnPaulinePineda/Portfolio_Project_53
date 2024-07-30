@@ -34,7 +34,7 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project explores parametric **Accelerated Failure Time** models with error distributions following the **Weibull**, **Normal** and **Log-Logistic** distributions using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark> to analyze time-to-event data by directly modelling  the time until an event of interest occurs. The resulting predictions derived from the candidate models were evaluated in terms of their discrimination power using the Harrel's concordance index metric, and their model fit using the brier score, mean squared error (MSE) and mean absolute error (MAE) metrics. Additionally, feature impact on model output were estimated using **Shapley Additive Explanations**. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document. 
+This project explores parametric **Accelerated Failure Time** models with error distributions following the **Weibull**, **Normal** and **Log-Logistic** distributions using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark> to analyze time-to-event data by directly modelling  the time until an event of interest occurs. The resulting predictions derived from the candidate models were evaluated in terms of their discrimination power using the Harrel's concordance index metric, and their model fit using the brier score and mean absolute error (MAE) metrics. Additionally, feature impact on model output were estimated using **Shapley Additive Explanations**. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document. 
 
 [Survival Analysis](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) deals with the analysis of time-to-event data. It focuses on the expected duration of time until one or more events of interest occur, such as death, failure, or relapse. This type of analysis is used to study and model the time until the occurrence of an event, taking into account that the event might not have occurred for all subjects during the study period. Several key aspects of survival analysis include the survival function which refers to the probability that an individual survives longer than a certain time, hazard function which describes the instantaneous rate at which events occur, given no prior event, and censoring pertaining to a condition where the event of interest has not occurred for some subjects during the observation period.
 
@@ -128,17 +128,22 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import KFold
 from sklearn.inspection import permutation_importance
+from sklearn.metrics import mean_absolute_error, brier_score_loss
 
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from scipy import stats
 from scipy.stats import ttest_ind, chi2_contingency
 
 from lifelines import KaplanMeierFitter
+from lifelines.fitters.weibull_fitter import WeibullFitter
+from lifelines.fitters.log_normal_fitter import LogNormalFitter
+from lifelines.fitters.log_logistic_fitter import LogLogisticFitter
 from lifelines.fitters.weibull_aft_fitter import WeibullAFTFitter
 from lifelines.fitters.log_normal_aft_fitter import LogNormalAFTFitter
 from lifelines.fitters.log_logistic_aft_fitter import LogLogisticAFTFitter
 from lifelines.utils import concordance_index
 from lifelines.statistics import logrank_test
+from lifelines.plotting import qq_plot
 import shap
 
 import warnings
@@ -7563,6 +7568,27 @@ cirrhosis_survival_test_modeling.head()
 [Weibull Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival time errors follow a Weibull distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a Weibull-distributed error term. This model is flexible as it can model both increasing and decreasing hazard rates over time and can be used to model various types of survival data. However, the results may be complex to interpret if the shape parameter does not align well with the data, and the model can also be sensitive to the distributional assumptions.
 
 
+```python
+##################################
+# Comparing the quantiles between the 
+# the observed survival times
+# and theoretical Weibull distribution
+##################################
+cirrhosis_survival_weibull = WeibullFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
+plt.figure(figsize=(17, 8)) 
+qq_plot(cirrhosis_survival_weibull, plot_kwargs={'marker': 'x', 'color': 'blue'})
+plt.xlabel('Fitted Weibull Quantiles')
+plt.ylabel('Empirical Quantiles')
+plt.title('QQ Plot: AFT_WEIBULL')
+plt.show()
+```
+
+
+    
+![png](output_162_0.png)
+    
+
+
 
 ```python
 ##################################
@@ -7570,7 +7596,7 @@ cirrhosis_survival_test_modeling.head()
 # based on a Weibull distribution
 # and generating the summary
 ##################################
-cirrhosis_survival_aft_weibull = WeibullAFTFitter()
+cirrhosis_survival_aft_weibull = WeibullAFTFitter(penalizer=0.30)
 cirrhosis_survival_aft_weibull.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
 cirrhosis_survival_aft_weibull.print_summary()
 ```
@@ -7605,6 +7631,10 @@ cirrhosis_survival_aft_weibull.print_summary()
       <td>'Status'</td>
     </tr>
     <tr>
+      <th>penalizer</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
       <th>number of observations</th>
       <td>218</td>
     </tr>
@@ -7614,11 +7644,11 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>log-likelihood</th>
-      <td>-763.34</td>
+      <td>-777.86</td>
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-29 12:51:26 UTC</td>
+      <td>2024-07-30 08:28:03 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -7644,270 +7674,270 @@ cirrhosis_survival_aft_weibull.print_summary()
     <tr>
       <th rowspan="18" valign="top">lambda_</th>
       <th>Age</th>
-      <td>-0.22</td>
-      <td>0.80</td>
-      <td>0.08</td>
-      <td>-0.39</td>
-      <td>-0.06</td>
-      <td>0.68</td>
-      <td>0.94</td>
+      <td>-0.17</td>
+      <td>0.85</td>
+      <td>0.07</td>
+      <td>-0.30</td>
+      <td>-0.03</td>
+      <td>0.74</td>
+      <td>0.98</td>
       <td>0.00</td>
-      <td>-2.69</td>
-      <td>0.01</td>
-      <td>7.11</td>
+      <td>-2.31</td>
+      <td>0.02</td>
+      <td>5.59</td>
     </tr>
     <tr>
       <th>Albumin</th>
-      <td>0.07</td>
-      <td>1.08</td>
-      <td>0.09</td>
-      <td>-0.11</td>
-      <td>0.26</td>
-      <td>0.90</td>
-      <td>1.29</td>
+      <td>0.10</td>
+      <td>1.10</td>
+      <td>0.08</td>
+      <td>-0.05</td>
+      <td>0.25</td>
+      <td>0.95</td>
+      <td>1.28</td>
       <td>0.00</td>
-      <td>0.82</td>
-      <td>0.41</td>
       <td>1.27</td>
+      <td>0.20</td>
+      <td>2.29</td>
     </tr>
     <tr>
       <th>Alk_Phos</th>
-      <td>-0.01</td>
-      <td>0.99</td>
-      <td>0.09</td>
-      <td>-0.19</td>
-      <td>0.16</td>
+      <td>-0.04</td>
+      <td>0.96</td>
+      <td>0.07</td>
+      <td>-0.18</td>
+      <td>0.11</td>
       <td>0.83</td>
-      <td>1.18</td>
+      <td>1.11</td>
       <td>0.00</td>
-      <td>-0.16</td>
-      <td>0.88</td>
-      <td>0.19</td>
+      <td>-0.52</td>
+      <td>0.60</td>
+      <td>0.74</td>
     </tr>
     <tr>
       <th>Ascites</th>
-      <td>-0.10</td>
-      <td>0.90</td>
-      <td>0.25</td>
-      <td>-0.58</td>
-      <td>0.38</td>
-      <td>0.56</td>
-      <td>1.46</td>
+      <td>-0.20</td>
+      <td>0.82</td>
+      <td>0.23</td>
+      <td>-0.66</td>
+      <td>0.26</td>
+      <td>0.51</td>
+      <td>1.29</td>
       <td>0.00</td>
-      <td>-0.42</td>
-      <td>0.67</td>
-      <td>0.57</td>
+      <td>-0.87</td>
+      <td>0.38</td>
+      <td>1.38</td>
     </tr>
     <tr>
       <th>Bilirubin</th>
-      <td>-0.45</td>
-      <td>0.64</td>
-      <td>0.13</td>
-      <td>-0.71</td>
-      <td>-0.20</td>
-      <td>0.49</td>
-      <td>0.82</td>
+      <td>-0.29</td>
+      <td>0.75</td>
+      <td>0.09</td>
+      <td>-0.46</td>
+      <td>-0.12</td>
+      <td>0.63</td>
+      <td>0.88</td>
       <td>0.00</td>
-      <td>-3.48</td>
+      <td>-3.39</td>
       <td>&lt;0.005</td>
-      <td>10.97</td>
+      <td>10.47</td>
     </tr>
     <tr>
       <th>Cholesterol</th>
-      <td>-0.03</td>
-      <td>0.97</td>
+      <td>-0.05</td>
+      <td>0.95</td>
+      <td>0.08</td>
+      <td>-0.20</td>
       <td>0.10</td>
-      <td>-0.22</td>
-      <td>0.17</td>
-      <td>0.80</td>
-      <td>1.18</td>
-      <td>0.00</td>
-      <td>-0.26</td>
-      <td>0.79</td>
-      <td>0.34</td>
-    </tr>
-    <tr>
-      <th>Copper</th>
-      <td>-0.06</td>
-      <td>0.94</td>
-      <td>0.10</td>
-      <td>-0.26</td>
-      <td>0.14</td>
-      <td>0.77</td>
-      <td>1.15</td>
+      <td>0.82</td>
+      <td>1.11</td>
       <td>0.00</td>
       <td>-0.61</td>
       <td>0.54</td>
       <td>0.89</td>
     </tr>
     <tr>
-      <th>Drug</th>
-      <td>0.14</td>
-      <td>1.16</td>
-      <td>0.15</td>
-      <td>-0.15</td>
-      <td>0.44</td>
-      <td>0.86</td>
-      <td>1.56</td>
+      <th>Copper</th>
+      <td>-0.11</td>
+      <td>0.89</td>
+      <td>0.08</td>
+      <td>-0.27</td>
+      <td>0.04</td>
+      <td>0.77</td>
+      <td>1.04</td>
       <td>0.00</td>
-      <td>0.95</td>
-      <td>0.34</td>
-      <td>1.54</td>
+      <td>-1.46</td>
+      <td>0.15</td>
+      <td>2.79</td>
+    </tr>
+    <tr>
+      <th>Drug</th>
+      <td>0.10</td>
+      <td>1.10</td>
+      <td>0.14</td>
+      <td>-0.17</td>
+      <td>0.37</td>
+      <td>0.84</td>
+      <td>1.44</td>
+      <td>0.00</td>
+      <td>0.71</td>
+      <td>0.48</td>
+      <td>1.07</td>
     </tr>
     <tr>
       <th>Edema</th>
       <td>-0.33</td>
       <td>0.72</td>
-      <td>0.19</td>
-      <td>-0.69</td>
-      <td>0.04</td>
-      <td>0.50</td>
-      <td>1.04</td>
+      <td>0.18</td>
+      <td>-0.68</td>
+      <td>0.01</td>
+      <td>0.51</td>
+      <td>1.01</td>
       <td>0.00</td>
-      <td>-1.73</td>
-      <td>0.08</td>
-      <td>3.59</td>
+      <td>-1.88</td>
+      <td>0.06</td>
+      <td>4.05</td>
     </tr>
     <tr>
       <th>Hepatomegaly</th>
-      <td>-0.04</td>
-      <td>0.96</td>
-      <td>0.17</td>
-      <td>-0.38</td>
-      <td>0.31</td>
-      <td>0.68</td>
-      <td>1.36</td>
+      <td>-0.11</td>
+      <td>0.90</td>
+      <td>0.15</td>
+      <td>-0.40</td>
+      <td>0.19</td>
+      <td>0.67</td>
+      <td>1.20</td>
       <td>0.00</td>
-      <td>-0.21</td>
-      <td>0.83</td>
-      <td>0.27</td>
+      <td>-0.72</td>
+      <td>0.47</td>
+      <td>1.08</td>
     </tr>
     <tr>
       <th>Platelets</th>
-      <td>0.03</td>
-      <td>1.03</td>
-      <td>0.08</td>
-      <td>-0.13</td>
-      <td>0.18</td>
-      <td>0.88</td>
-      <td>1.20</td>
+      <td>0.05</td>
+      <td>1.06</td>
+      <td>0.07</td>
+      <td>-0.08</td>
+      <td>0.19</td>
+      <td>0.92</td>
+      <td>1.21</td>
       <td>0.00</td>
-      <td>0.34</td>
-      <td>0.73</td>
-      <td>0.45</td>
+      <td>0.77</td>
+      <td>0.44</td>
+      <td>1.18</td>
     </tr>
     <tr>
       <th>Prothrombin</th>
-      <td>-0.23</td>
-      <td>0.80</td>
-      <td>0.09</td>
-      <td>-0.40</td>
+      <td>-0.19</td>
+      <td>0.83</td>
+      <td>0.08</td>
+      <td>-0.34</td>
       <td>-0.05</td>
-      <td>0.67</td>
-      <td>0.95</td>
+      <td>0.71</td>
+      <td>0.96</td>
       <td>0.00</td>
       <td>-2.56</td>
       <td>0.01</td>
-      <td>6.58</td>
+      <td>6.57</td>
     </tr>
     <tr>
       <th>SGOT</th>
-      <td>-0.10</td>
+      <td>-0.11</td>
       <td>0.90</td>
-      <td>0.10</td>
-      <td>-0.29</td>
       <td>0.08</td>
-      <td>0.75</td>
-      <td>1.09</td>
+      <td>-0.26</td>
+      <td>0.04</td>
+      <td>0.77</td>
+      <td>1.04</td>
       <td>0.00</td>
-      <td>-1.08</td>
-      <td>0.28</td>
-      <td>1.84</td>
+      <td>-1.44</td>
+      <td>0.15</td>
+      <td>2.74</td>
     </tr>
     <tr>
       <th>Sex</th>
-      <td>-0.04</td>
-      <td>0.96</td>
-      <td>0.22</td>
-      <td>-0.47</td>
-      <td>0.38</td>
-      <td>0.63</td>
-      <td>1.47</td>
-      <td>0.00</td>
-      <td>-0.19</td>
-      <td>0.85</td>
-      <td>0.23</td>
-    </tr>
-    <tr>
-      <th>Spiders</th>
       <td>0.02</td>
       <td>1.02</td>
-      <td>0.18</td>
-      <td>-0.33</td>
-      <td>0.37</td>
-      <td>0.72</td>
-      <td>1.44</td>
+      <td>0.19</td>
+      <td>-0.35</td>
+      <td>0.40</td>
+      <td>0.70</td>
+      <td>1.49</td>
       <td>0.00</td>
-      <td>0.12</td>
-      <td>0.90</td>
+      <td>0.11</td>
+      <td>0.91</td>
       <td>0.14</td>
     </tr>
     <tr>
-      <th>Stage_4.0</th>
-      <td>-0.12</td>
-      <td>0.89</td>
-      <td>0.18</td>
-      <td>-0.48</td>
-      <td>0.25</td>
-      <td>0.62</td>
-      <td>1.28</td>
+      <th>Spiders</th>
+      <td>-0.04</td>
+      <td>0.96</td>
+      <td>0.16</td>
+      <td>-0.35</td>
+      <td>0.27</td>
+      <td>0.71</td>
+      <td>1.30</td>
       <td>0.00</td>
-      <td>-0.62</td>
-      <td>0.53</td>
-      <td>0.91</td>
+      <td>-0.26</td>
+      <td>0.79</td>
+      <td>0.33</td>
+    </tr>
+    <tr>
+      <th>Stage_4.0</th>
+      <td>-0.15</td>
+      <td>0.86</td>
+      <td>0.16</td>
+      <td>-0.46</td>
+      <td>0.16</td>
+      <td>0.63</td>
+      <td>1.17</td>
+      <td>0.00</td>
+      <td>-0.96</td>
+      <td>0.34</td>
+      <td>1.56</td>
     </tr>
     <tr>
       <th>Tryglicerides</th>
-      <td>-0.07</td>
-      <td>0.93</td>
+      <td>-0.06</td>
+      <td>0.94</td>
+      <td>0.07</td>
+      <td>-0.20</td>
       <td>0.08</td>
-      <td>-0.24</td>
-      <td>0.09</td>
-      <td>0.79</td>
-      <td>1.09</td>
+      <td>0.82</td>
+      <td>1.08</td>
       <td>0.00</td>
-      <td>-0.89</td>
+      <td>-0.88</td>
       <td>0.38</td>
-      <td>1.41</td>
+      <td>1.40</td>
     </tr>
     <tr>
       <th>Intercept</th>
-      <td>8.47</td>
-      <td>4782.16</td>
-      <td>0.23</td>
-      <td>8.01</td>
-      <td>8.93</td>
-      <td>3023.89</td>
-      <td>7562.79</td>
+      <td>8.52</td>
+      <td>5006.58</td>
+      <td>0.21</td>
+      <td>8.10</td>
+      <td>8.94</td>
+      <td>3292.49</td>
+      <td>7613.01</td>
       <td>0.00</td>
-      <td>36.23</td>
+      <td>39.84</td>
       <td>&lt;0.005</td>
-      <td>952.37</td>
+      <td>inf</td>
     </tr>
     <tr>
       <th>rho_</th>
       <th>Intercept</th>
-      <td>0.48</td>
-      <td>1.62</td>
-      <td>0.09</td>
-      <td>0.31</td>
-      <td>0.66</td>
-      <td>1.36</td>
-      <td>1.93</td>
+      <td>0.34</td>
+      <td>1.41</td>
+      <td>0.07</td>
+      <td>0.20</td>
+      <td>0.49</td>
+      <td>1.22</td>
+      <td>1.63</td>
       <td>0.00</td>
-      <td>5.42</td>
+      <td>4.61</td>
       <td>&lt;0.005</td>
-      <td>24.02</td>
+      <td>17.96</td>
     </tr>
   </tbody>
 </table><br><div>
@@ -7932,15 +7962,15 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>AIC</th>
-      <td>1564.67</td>
+      <td>1593.72</td>
     </tr>
     <tr>
       <th>log-likelihood ratio test</th>
-      <td>130.79 on 17 df</td>
+      <td>101.74 on 17 df</td>
     </tr>
     <tr>
       <th>-log2(p) of ll-ratio test</th>
-      <td>62.71</td>
+      <td>44.43</td>
     </tr>
   </tbody>
 </table>
@@ -7975,7 +8005,227 @@ plt.show()
 
 
     
-![png](output_163_0.png)
+![png](output_164_0.png)
+    
+
+
+
+```python
+##################################
+# Determining the number of
+# significant predictors
+##################################
+cirrhosis_survival_aft_weibull_significant = sum(cirrhosis_survival_aft_weibull_summary['p'] < 0.05)
+display(f"Number of Significant Predictors: {cirrhosis_survival_aft_weibull_significant-2}")
+```
+
+
+    'Number of Significant Predictors: 3'
+
+
+
+```python
+##################################
+# Gathering the apparent model performance
+# as baseline for evaluating overfitting
+##################################
+features_significant = ['Bilirubin','Prothrombin','Age','N_Days','Status']
+cirrhosis_survival_aft_weibull.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+train_predictions = cirrhosis_survival_aft_weibull.predict_median(cirrhosis_survival_train_modeling)
+cirrhosis_survival_aft_weibull_train_ci = concordance_index(cirrhosis_survival_train_modeling['N_Days'], 
+                                                            train_predictions, 
+                                                            cirrhosis_survival_train_modeling['Status'])
+time_point = cirrhosis_survival_train_modeling['N_Days'].median()
+cirrhosis_survival_aft_weibull_train_mae = mean_absolute_error(cirrhosis_survival_train_modeling['N_Days'], train_predictions)
+cirrhosis_survival_aft_weibull_train_brier = brier_score_loss(cirrhosis_survival_train_modeling['Status'], 
+                                                              cirrhosis_survival_aft_weibull.predict_survival_function(cirrhosis_survival_train_modeling, 
+                                                                                                                       times=[time_point]).T[time_point])
+display(f"Apparent Concordance Index: {cirrhosis_survival_aft_weibull_train_ci}")
+display(f"Apparent MAE: {cirrhosis_survival_aft_weibull_train_mae}")
+display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_train_brier}")
+```
+
+
+    'Apparent Concordance Index: 0.8525682704811444'
+
+
+
+    'Apparent MAE: 2805.6130546583813'
+
+
+
+    'Apparent Brier Score: 0.542714145030189'
+
+
+
+```python
+##################################
+# Performing 5-Fold Cross-Validation
+# on the training data
+##################################
+kf = KFold(n_splits=5, shuffle=True, random_state=88888888)
+ci_scores = []
+mae_scores = []
+brier_scores = []
+
+for train_index, val_index in kf.split(cirrhosis_survival_train_modeling):
+    df_train_fold = cirrhosis_survival_train_modeling.iloc[train_index]
+    df_val_fold = cirrhosis_survival_train_modeling.iloc[val_index]
+    
+    cirrhosis_survival_aft_weibull.fit(df_train_fold, duration_col='N_Days', event_col='Status')
+    val_predictions = cirrhosis_survival_aft_weibull.predict_median(df_val_fold)
+    time_point = df_val_fold['N_Days'].median()
+    ci = concordance_index(df_val_fold['N_Days'], val_predictions, df_val_fold['Status'])
+    mae = mean_absolute_error(df_val_fold['N_Days'], val_predictions)
+    brier = brier_score_loss(df_val_fold['Status'],
+                             cirrhosis_survival_aft_weibull.predict_survival_function(df_val_fold, 
+                                                                                      times=[time_point]).T[time_point])
+    ci_scores.append(ci)
+    mae_scores.append(mae)
+    brier_scores.append(brier)
+
+cirrhosis_survival_aft_weibull_cv_ci_mean = np.mean(ci_scores)
+cirrhosis_survival_aft_weibull_cv_ci_std = np.std(ci_scores)
+cirrhosis_survival_aft_weibull_cv_mae_mean = np.mean(mae_scores)
+cirrhosis_survival_aft_weibull_cv_brier_mean = np.mean(brier_scores)
+
+display(f"Cross-Validated Concordance Index: {cirrhosis_survival_aft_weibull_cv_ci_mean}")
+display(f"Cross-Validated MAE: {cirrhosis_survival_aft_weibull_cv_mae_mean}")
+display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_weibull_cv_brier_mean}")
+```
+
+
+    'Cross-Validated Concordance Index: 0.812420042883874'
+
+
+
+    'Cross-Validated MAE: 2931.480821658067'
+
+
+
+    'Cross-Validated Brier Score: 0.534747947646952'
+
+
+
+```python
+##################################
+# Evaluating the model performance
+# on test data
+##################################
+test_predictions = cirrhosis_survival_aft_weibull.predict_median(cirrhosis_survival_test_modeling)
+cirrhosis_survival_aft_weibull_test_ci = concordance_index(cirrhosis_survival_test_modeling['N_Days'], 
+                                                           test_predictions, 
+                                                           cirrhosis_survival_test_modeling['Status'])
+time_point = cirrhosis_survival_test_modeling['N_Days'].median()
+cirrhosis_survival_aft_weibull_test_mae = mean_absolute_error(cirrhosis_survival_test_modeling['N_Days'], test_predictions)
+cirrhosis_survival_aft_weibull_test_brier = brier_score_loss(cirrhosis_survival_test_modeling['Status'], 
+                                                              cirrhosis_survival_aft_weibull.predict_survival_function(cirrhosis_survival_test_modeling, 
+                                                                                                                       times=[time_point]).T[time_point])
+display(f"Apparent Concordance Index: {cirrhosis_survival_aft_weibull_test_ci}")
+display(f"Apparent MAE: {cirrhosis_survival_aft_weibull_test_mae}")
+display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_test_brier}")
+```
+
+
+    'Apparent Concordance Index: 0.8702947845804989'
+
+
+
+    'Apparent MAE: 2211.5902990130917'
+
+
+
+    'Apparent Brier Score: 0.5713669839968856'
+
+
+
+```python
+##################################
+# Gathering the concordance indices
+# from training, cross-validation and test
+##################################
+coxph_aft_weibull_set = pd.DataFrame(["Train","Cross-Validation","Test"])
+coxph_aft_weibull_ci_values = pd.DataFrame([cirrhosis_survival_aft_weibull_train_ci,
+                                           cirrhosis_survival_aft_weibull_cv_ci_mean,
+                                           cirrhosis_survival_aft_weibull_test_ci])
+coxph_aft_weibull_method = pd.DataFrame(["AFT_WEIBULL"]*3)
+coxph_aft_weibull_summary = pd.concat([coxph_aft_weibull_set, 
+                                       coxph_aft_weibull_ci_values,
+                                       coxph_aft_weibull_method], 
+                                      axis=1)
+coxph_aft_weibull_summary.columns = ['Set', 'Concordance.Index', 'Method']
+coxph_aft_weibull_summary.reset_index(inplace=True, drop=True)
+display(coxph_aft_weibull_summary)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Set</th>
+      <th>Concordance.Index</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Train</td>
+      <td>0.852568</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Cross-Validation</td>
+      <td>0.812420</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Test</td>
+      <td>0.870295</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the predicted
+# and actual survival times
+##################################
+predicted_survival_times = cirrhosis_survival_aft_weibull.predict_median(cirrhosis_survival_test_modeling)
+plt.figure(figsize=(17, 8))
+plt.scatter(cirrhosis_survival_test_modeling['N_Days'], predicted_survival_times)
+plt.xlabel('Actual Survival Time')
+plt.ylabel('Predicted Survival Time')
+plt.title('AFT_WEIBULL: Predicted Versus Actual Survival Times')
+plt.plot([cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 
+         [cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 'k--')
+plt.show()
+```
+
+
+    
+![png](output_170_0.png)
     
 
 
@@ -7993,11 +8243,33 @@ plt.show()
 
 ```python
 ##################################
+# Comparing the quantiles between the 
+# the observed survival times
+# and theoretical Log-Normal distribution
+##################################
+cirrhosis_survival_lognormal = LogNormalFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
+plt.figure(figsize=(17, 8)) 
+qq_plot(cirrhosis_survival_lognormal, plot_kwargs={'marker': 'x', 'color': 'blue'})
+plt.xlabel('Fitted Log-Normal Quantiles')
+plt.ylabel('Empirical Quantiles')
+plt.title('QQ Plot: AFT_LOGNORMAL')
+plt.show()
+```
+
+
+    
+![png](output_172_0.png)
+    
+
+
+
+```python
+##################################
 # Formulating the Accelerated Failure Time model
 # based on a Log-Normal distribution
 # and generating the summary
 ##################################
-cirrhosis_survival_aft_lognormal = LogNormalAFTFitter()
+cirrhosis_survival_aft_lognormal = LogNormalAFTFitter(penalizer=0.30)
 cirrhosis_survival_aft_lognormal.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
 cirrhosis_survival_aft_lognormal.print_summary()
 ```
@@ -8032,6 +8304,10 @@ cirrhosis_survival_aft_lognormal.print_summary()
       <td>'Status'</td>
     </tr>
     <tr>
+      <th>penalizer</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
       <th>number of observations</th>
       <td>218</td>
     </tr>
@@ -8041,11 +8317,11 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>log-likelihood</th>
-      <td>-759.55</td>
+      <td>-769.81</td>
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-29 12:51:27 UTC</td>
+      <td>2024-07-30 08:28:09 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8071,270 +8347,270 @@ cirrhosis_survival_aft_lognormal.print_summary()
     <tr>
       <th rowspan="18" valign="top">mu_</th>
       <th>Age</th>
-      <td>-0.26</td>
-      <td>0.77</td>
-      <td>0.09</td>
-      <td>-0.43</td>
-      <td>-0.09</td>
-      <td>0.65</td>
-      <td>0.91</td>
+      <td>-0.18</td>
+      <td>0.83</td>
+      <td>0.07</td>
+      <td>-0.32</td>
+      <td>-0.05</td>
+      <td>0.73</td>
+      <td>0.95</td>
       <td>0.00</td>
-      <td>-2.99</td>
-      <td>&lt;0.005</td>
-      <td>8.46</td>
+      <td>-2.62</td>
+      <td>0.01</td>
+      <td>6.85</td>
     </tr>
     <tr>
       <th>Albumin</th>
-      <td>0.05</td>
-      <td>1.05</td>
-      <td>0.09</td>
-      <td>-0.13</td>
+      <td>0.08</td>
+      <td>1.09</td>
+      <td>0.07</td>
+      <td>-0.06</td>
       <td>0.22</td>
-      <td>0.88</td>
+      <td>0.95</td>
       <td>1.25</td>
       <td>0.00</td>
-      <td>0.54</td>
-      <td>0.59</td>
-      <td>0.76</td>
+      <td>1.16</td>
+      <td>0.24</td>
+      <td>2.03</td>
     </tr>
     <tr>
       <th>Alk_Phos</th>
       <td>-0.03</td>
       <td>0.97</td>
-      <td>0.09</td>
-      <td>-0.20</td>
-      <td>0.15</td>
-      <td>0.82</td>
-      <td>1.16</td>
+      <td>0.07</td>
+      <td>-0.17</td>
+      <td>0.11</td>
+      <td>0.85</td>
+      <td>1.12</td>
       <td>0.00</td>
-      <td>-0.32</td>
-      <td>0.75</td>
-      <td>0.42</td>
+      <td>-0.40</td>
+      <td>0.69</td>
+      <td>0.54</td>
     </tr>
     <tr>
       <th>Ascites</th>
-      <td>-0.26</td>
-      <td>0.77</td>
-      <td>0.29</td>
-      <td>-0.83</td>
-      <td>0.30</td>
+      <td>-0.33</td>
+      <td>0.72</td>
+      <td>0.25</td>
+      <td>-0.81</td>
+      <td>0.16</td>
       <td>0.44</td>
-      <td>1.35</td>
+      <td>1.17</td>
       <td>0.00</td>
-      <td>-0.91</td>
-      <td>0.36</td>
-      <td>1.46</td>
+      <td>-1.32</td>
+      <td>0.19</td>
+      <td>2.43</td>
     </tr>
     <tr>
       <th>Bilirubin</th>
-      <td>-0.37</td>
-      <td>0.69</td>
-      <td>0.13</td>
-      <td>-0.62</td>
-      <td>-0.12</td>
-      <td>0.54</td>
-      <td>0.89</td>
+      <td>-0.26</td>
+      <td>0.77</td>
+      <td>0.08</td>
+      <td>-0.42</td>
+      <td>-0.09</td>
+      <td>0.66</td>
+      <td>0.91</td>
       <td>0.00</td>
-      <td>-2.86</td>
+      <td>-3.06</td>
       <td>&lt;0.005</td>
-      <td>7.90</td>
+      <td>8.83</td>
     </tr>
     <tr>
       <th>Cholesterol</th>
-      <td>0.05</td>
-      <td>1.05</td>
-      <td>0.10</td>
-      <td>-0.14</td>
-      <td>0.24</td>
-      <td>0.87</td>
-      <td>1.28</td>
+      <td>0.01</td>
+      <td>1.01</td>
+      <td>0.07</td>
+      <td>-0.13</td>
+      <td>0.16</td>
+      <td>0.88</td>
+      <td>1.17</td>
       <td>0.00</td>
-      <td>0.54</td>
-      <td>0.59</td>
-      <td>0.77</td>
+      <td>0.18</td>
+      <td>0.86</td>
+      <td>0.22</td>
     </tr>
     <tr>
       <th>Copper</th>
       <td>-0.16</td>
       <td>0.85</td>
-      <td>0.10</td>
-      <td>-0.36</td>
-      <td>0.03</td>
-      <td>0.70</td>
-      <td>1.03</td>
+      <td>0.07</td>
+      <td>-0.30</td>
+      <td>-0.01</td>
+      <td>0.74</td>
+      <td>0.99</td>
       <td>0.00</td>
-      <td>-1.68</td>
-      <td>0.09</td>
-      <td>3.42</td>
+      <td>-2.12</td>
+      <td>0.03</td>
+      <td>4.89</td>
     </tr>
     <tr>
       <th>Drug</th>
-      <td>0.12</td>
-      <td>1.12</td>
-      <td>0.15</td>
-      <td>-0.18</td>
-      <td>0.42</td>
-      <td>0.83</td>
-      <td>1.52</td>
+      <td>0.09</td>
+      <td>1.10</td>
+      <td>0.13</td>
+      <td>-0.16</td>
+      <td>0.35</td>
+      <td>0.85</td>
+      <td>1.42</td>
       <td>0.00</td>
-      <td>0.77</td>
-      <td>0.44</td>
-      <td>1.18</td>
+      <td>0.70</td>
+      <td>0.48</td>
+      <td>1.05</td>
     </tr>
     <tr>
       <th>Edema</th>
-      <td>-0.38</td>
-      <td>0.68</td>
-      <td>0.22</td>
-      <td>-0.80</td>
-      <td>0.04</td>
-      <td>0.45</td>
-      <td>1.04</td>
+      <td>-0.37</td>
+      <td>0.69</td>
+      <td>0.18</td>
+      <td>-0.73</td>
+      <td>-0.01</td>
+      <td>0.48</td>
+      <td>0.99</td>
       <td>0.00</td>
-      <td>-1.76</td>
-      <td>0.08</td>
-      <td>3.68</td>
+      <td>-2.04</td>
+      <td>0.04</td>
+      <td>4.60</td>
     </tr>
     <tr>
       <th>Hepatomegaly</th>
-      <td>0.02</td>
-      <td>1.02</td>
-      <td>0.18</td>
-      <td>-0.32</td>
-      <td>0.37</td>
-      <td>0.73</td>
-      <td>1.45</td>
-      <td>0.00</td>
+      <td>-0.06</td>
+      <td>0.94</td>
       <td>0.14</td>
-      <td>0.89</td>
-      <td>0.17</td>
+      <td>-0.34</td>
+      <td>0.22</td>
+      <td>0.71</td>
+      <td>1.24</td>
+      <td>0.00</td>
+      <td>-0.43</td>
+      <td>0.67</td>
+      <td>0.58</td>
     </tr>
     <tr>
       <th>Platelets</th>
-      <td>0.05</td>
-      <td>1.05</td>
-      <td>0.09</td>
-      <td>-0.12</td>
-      <td>0.22</td>
-      <td>0.88</td>
-      <td>1.25</td>
+      <td>0.08</td>
+      <td>1.08</td>
+      <td>0.07</td>
+      <td>-0.06</td>
+      <td>0.21</td>
+      <td>0.94</td>
+      <td>1.24</td>
       <td>0.00</td>
-      <td>0.55</td>
-      <td>0.58</td>
-      <td>0.78</td>
+      <td>1.11</td>
+      <td>0.27</td>
+      <td>1.92</td>
     </tr>
     <tr>
       <th>Prothrombin</th>
-      <td>-0.22</td>
-      <td>0.80</td>
-      <td>0.09</td>
-      <td>-0.41</td>
+      <td>-0.18</td>
+      <td>0.83</td>
+      <td>0.07</td>
+      <td>-0.33</td>
       <td>-0.04</td>
-      <td>0.67</td>
+      <td>0.72</td>
       <td>0.96</td>
       <td>0.00</td>
-      <td>-2.36</td>
-      <td>0.02</td>
-      <td>5.79</td>
+      <td>-2.53</td>
+      <td>0.01</td>
+      <td>6.47</td>
     </tr>
     <tr>
       <th>SGOT</th>
       <td>-0.09</td>
-      <td>0.92</td>
-      <td>0.10</td>
-      <td>-0.28</td>
-      <td>0.10</td>
-      <td>0.76</td>
-      <td>1.11</td>
+      <td>0.91</td>
+      <td>0.07</td>
+      <td>-0.23</td>
+      <td>0.05</td>
+      <td>0.79</td>
+      <td>1.05</td>
       <td>0.00</td>
-      <td>-0.89</td>
-      <td>0.37</td>
-      <td>1.42</td>
+      <td>-1.24</td>
+      <td>0.22</td>
+      <td>2.21</td>
     </tr>
     <tr>
       <th>Sex</th>
-      <td>-0.03</td>
-      <td>0.97</td>
-      <td>0.22</td>
-      <td>-0.46</td>
-      <td>0.39</td>
-      <td>0.63</td>
-      <td>1.48</td>
+      <td>0.04</td>
+      <td>1.04</td>
+      <td>0.19</td>
+      <td>-0.32</td>
+      <td>0.40</td>
+      <td>0.72</td>
+      <td>1.49</td>
       <td>0.00</td>
-      <td>-0.15</td>
-      <td>0.88</td>
-      <td>0.18</td>
+      <td>0.21</td>
+      <td>0.83</td>
+      <td>0.26</td>
     </tr>
     <tr>
       <th>Spiders</th>
-      <td>-0.21</td>
-      <td>0.81</td>
-      <td>0.18</td>
-      <td>-0.57</td>
+      <td>-0.18</td>
+      <td>0.84</td>
       <td>0.15</td>
-      <td>0.57</td>
-      <td>1.16</td>
+      <td>-0.47</td>
+      <td>0.12</td>
+      <td>0.62</td>
+      <td>1.12</td>
       <td>0.00</td>
-      <td>-1.16</td>
-      <td>0.25</td>
-      <td>2.02</td>
+      <td>-1.19</td>
+      <td>0.24</td>
+      <td>2.08</td>
     </tr>
     <tr>
       <th>Stage_4.0</th>
-      <td>-0.29</td>
-      <td>0.75</td>
-      <td>0.20</td>
-      <td>-0.67</td>
-      <td>0.10</td>
-      <td>0.51</td>
-      <td>1.10</td>
+      <td>-0.26</td>
+      <td>0.77</td>
+      <td>0.15</td>
+      <td>-0.57</td>
+      <td>0.04</td>
+      <td>0.57</td>
+      <td>1.04</td>
       <td>0.00</td>
-      <td>-1.46</td>
-      <td>0.14</td>
-      <td>2.80</td>
+      <td>-1.70</td>
+      <td>0.09</td>
+      <td>3.50</td>
     </tr>
     <tr>
       <th>Tryglicerides</th>
-      <td>-0.12</td>
-      <td>0.89</td>
-      <td>0.09</td>
-      <td>-0.29</td>
-      <td>0.06</td>
-      <td>0.75</td>
-      <td>1.06</td>
+      <td>-0.09</td>
+      <td>0.92</td>
+      <td>0.07</td>
+      <td>-0.23</td>
+      <td>0.05</td>
+      <td>0.80</td>
+      <td>1.05</td>
       <td>0.00</td>
-      <td>-1.30</td>
-      <td>0.19</td>
-      <td>2.37</td>
+      <td>-1.24</td>
+      <td>0.22</td>
+      <td>2.21</td>
     </tr>
     <tr>
       <th>Intercept</th>
-      <td>8.30</td>
-      <td>4043.88</td>
-      <td>0.24</td>
-      <td>7.83</td>
-      <td>8.78</td>
-      <td>2521.93</td>
-      <td>6484.30</td>
+      <td>8.26</td>
+      <td>3879.36</td>
+      <td>0.21</td>
+      <td>7.86</td>
+      <td>8.67</td>
+      <td>2580.42</td>
+      <td>5832.16</td>
       <td>0.00</td>
-      <td>34.47</td>
+      <td>39.72</td>
       <td>&lt;0.005</td>
-      <td>862.67</td>
+      <td>inf</td>
     </tr>
     <tr>
       <th>sigma_</th>
       <th>Intercept</th>
-      <td>-0.18</td>
-      <td>0.83</td>
-      <td>0.08</td>
-      <td>-0.34</td>
-      <td>-0.03</td>
-      <td>0.71</td>
-      <td>0.97</td>
+      <td>-0.14</td>
+      <td>0.87</td>
+      <td>0.07</td>
+      <td>-0.28</td>
+      <td>-0.01</td>
+      <td>0.76</td>
+      <td>0.99</td>
       <td>0.00</td>
-      <td>-2.29</td>
-      <td>0.02</td>
-      <td>5.52</td>
+      <td>-2.15</td>
+      <td>0.03</td>
+      <td>5.00</td>
     </tr>
   </tbody>
 </table><br><div>
@@ -8359,15 +8635,15 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>AIC</th>
-      <td>1557.09</td>
+      <td>1577.63</td>
     </tr>
     <tr>
       <th>log-likelihood ratio test</th>
-      <td>143.11 on 17 df</td>
+      <td>122.57 on 17 df</td>
     </tr>
     <tr>
       <th>-log2(p) of ll-ratio test</th>
-      <td>70.64</td>
+      <td>57.48</td>
     </tr>
   </tbody>
 </table>
@@ -8402,7 +8678,226 @@ plt.show()
 
 
     
-![png](output_166_0.png)
+![png](output_174_0.png)
+    
+
+
+
+```python
+##################################
+# Determining the number of
+# significant predictors
+##################################
+cirrhosis_survival_aft_lognormal_significant = sum(cirrhosis_survival_aft_lognormal_summary['p'] < 0.05)
+display(f"Number of Significant Predictors: {cirrhosis_survival_aft_lognormal_significant-2}")
+```
+
+
+    'Number of Significant Predictors: 5'
+
+
+
+```python
+##################################
+# Gathering the apparent model performance
+# as baseline for evaluating overfitting
+##################################
+cirrhosis_survival_aft_lognormal.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+train_predictions = cirrhosis_survival_aft_lognormal.predict_median(cirrhosis_survival_train_modeling)
+cirrhosis_survival_aft_lognormal_train_ci = concordance_index(cirrhosis_survival_train_modeling['N_Days'], 
+                                                            train_predictions, 
+                                                            cirrhosis_survival_train_modeling['Status'])
+time_point = cirrhosis_survival_train_modeling['N_Days'].median()
+cirrhosis_survival_aft_lognormal_train_mae = mean_absolute_error(cirrhosis_survival_train_modeling['N_Days'], train_predictions)
+cirrhosis_survival_aft_lognormal_train_brier = brier_score_loss(cirrhosis_survival_train_modeling['Status'], 
+                                                              cirrhosis_survival_aft_lognormal.predict_survival_function(cirrhosis_survival_train_modeling, 
+                                                                                                                       times=[time_point]).T[time_point])
+display(f"Apparent Concordance Index: {cirrhosis_survival_aft_lognormal_train_ci}")
+display(f"Apparent MAE: {cirrhosis_survival_aft_lognormal_train_mae}")
+display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_train_brier}")
+```
+
+
+    'Apparent Concordance Index: 0.8528120936280884'
+
+
+
+    'Apparent MAE: 2743.628741181377'
+
+
+
+    'Apparent Brier Score: 0.5644575168949746'
+
+
+
+```python
+##################################
+# Performing 5-Fold Cross-Validation
+# on the training data
+##################################
+kf = KFold(n_splits=5, shuffle=True, random_state=88888888)
+ci_scores = []
+mae_scores = []
+brier_scores = []
+
+for train_index, val_index in kf.split(cirrhosis_survival_train_modeling):
+    df_train_fold = cirrhosis_survival_train_modeling.iloc[train_index]
+    df_val_fold = cirrhosis_survival_train_modeling.iloc[val_index]
+    
+    cirrhosis_survival_aft_lognormal.fit(df_train_fold, duration_col='N_Days', event_col='Status')
+    val_predictions = cirrhosis_survival_aft_lognormal.predict_median(df_val_fold)
+    time_point = df_val_fold['N_Days'].median()
+    ci = concordance_index(df_val_fold['N_Days'], val_predictions, df_val_fold['Status'])
+    mae = mean_absolute_error(df_val_fold['N_Days'], val_predictions)
+    brier = brier_score_loss(df_val_fold['Status'],
+                             cirrhosis_survival_aft_lognormal.predict_survival_function(df_val_fold, 
+                                                                                      times=[time_point]).T[time_point])
+    ci_scores.append(ci)
+    mae_scores.append(mae)
+    brier_scores.append(brier)
+
+cirrhosis_survival_aft_lognormal_cv_ci_mean = np.mean(ci_scores)
+cirrhosis_survival_aft_lognormal_cv_ci_std = np.std(ci_scores)
+cirrhosis_survival_aft_lognormal_cv_mae_mean = np.mean(mae_scores)
+cirrhosis_survival_aft_lognormal_cv_brier_mean = np.mean(brier_scores)
+
+display(f"Cross-Validated Concordance Index: {cirrhosis_survival_aft_lognormal_cv_ci_mean}")
+display(f"Cross-Validated MAE: {cirrhosis_survival_aft_lognormal_cv_mae_mean}")
+display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_lognormal_cv_brier_mean}")
+```
+
+
+    'Cross-Validated Concordance Index: 0.8132411500056491'
+
+
+
+    'Cross-Validated MAE: 2798.348656958315'
+
+
+
+    'Cross-Validated Brier Score: 0.555337384006344'
+
+
+
+```python
+##################################
+# Evaluating the model performance
+# on test data
+##################################
+test_predictions = cirrhosis_survival_aft_lognormal.predict_median(cirrhosis_survival_test_modeling)
+cirrhosis_survival_aft_lognormal_test_ci = concordance_index(cirrhosis_survival_test_modeling['N_Days'], 
+                                                           test_predictions, 
+                                                           cirrhosis_survival_test_modeling['Status'])
+time_point = cirrhosis_survival_test_modeling['N_Days'].median()
+cirrhosis_survival_aft_lognormal_test_mae = mean_absolute_error(cirrhosis_survival_test_modeling['N_Days'], test_predictions)
+cirrhosis_survival_aft_lognormal_test_brier = brier_score_loss(cirrhosis_survival_test_modeling['Status'], 
+                                                              cirrhosis_survival_aft_lognormal.predict_survival_function(cirrhosis_survival_test_modeling, 
+                                                                                                                       times=[time_point]).T[time_point])
+display(f"Apparent Concordance Index: {cirrhosis_survival_aft_lognormal_test_ci}")
+display(f"Apparent MAE: {cirrhosis_survival_aft_lognormal_test_mae}")
+display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_test_brier}")
+```
+
+
+    'Apparent Concordance Index: 0.8775510204081632'
+
+
+
+    'Apparent MAE: 2017.4183597977756'
+
+
+
+    'Apparent Brier Score: 0.5996287786549918'
+
+
+
+```python
+##################################
+# Gathering the concordance indices
+# from training, cross-validation and test
+##################################
+coxph_aft_lognormal_set = pd.DataFrame(["Train","Cross-Validation","Test"])
+coxph_aft_lognormal_ci_values = pd.DataFrame([cirrhosis_survival_aft_lognormal_train_ci,
+                                           cirrhosis_survival_aft_lognormal_cv_ci_mean,
+                                           cirrhosis_survival_aft_lognormal_test_ci])
+coxph_aft_lognormal_method = pd.DataFrame(["AFT_LOGNORMAL"]*3)
+coxph_aft_lognormal_summary = pd.concat([coxph_aft_lognormal_set, 
+                                       coxph_aft_lognormal_ci_values,
+                                       coxph_aft_lognormal_method], 
+                                      axis=1)
+coxph_aft_lognormal_summary.columns = ['Set', 'Concordance.Index', 'Method']
+coxph_aft_lognormal_summary.reset_index(inplace=True, drop=True)
+display(coxph_aft_lognormal_summary)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Set</th>
+      <th>Concordance.Index</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Train</td>
+      <td>0.852812</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Cross-Validation</td>
+      <td>0.813241</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Test</td>
+      <td>0.877551</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the predicted
+# and actual survival times
+##################################
+predicted_survival_times = cirrhosis_survival_aft_lognormal.predict_median(cirrhosis_survival_test_modeling)
+plt.figure(figsize=(17, 8))
+plt.scatter(cirrhosis_survival_test_modeling['N_Days'], predicted_survival_times)
+plt.xlabel('Actual Survival Time')
+plt.ylabel('Predicted Survival Time')
+plt.title('AFT_LOGNORMAL: Predicted Versus Actual Survival Times')
+plt.plot([cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 
+         [cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 'k--')
+plt.show()
+```
+
+
+    
+![png](output_180_0.png)
     
 
 
@@ -8420,11 +8915,33 @@ plt.show()
 
 ```python
 ##################################
+# Comparing the quantiles between the 
+# the observed survival times
+# and theoretical Log-Logistic distribution
+##################################
+cirrhosis_survival_loglogistic = LogLogisticFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
+plt.figure(figsize=(17, 8)) 
+qq_plot(cirrhosis_survival_loglogistic, plot_kwargs={'marker': 'x', 'color': 'blue'})
+plt.xlabel('Fitted Log-Logistic Quantiles')
+plt.ylabel('Empirical Quantiles')
+plt.title('QQ Plot: AFT_LOGLOGISTIC')
+plt.show()
+```
+
+
+    
+![png](output_182_0.png)
+    
+
+
+
+```python
+##################################
 # Formulating the Accelerated Failure Time model
 # based on a Log-Logistic distribution
 # and generating the summary
 ##################################
-cirrhosis_survival_aft_loglogistic = LogLogisticAFTFitter()
+cirrhosis_survival_aft_loglogistic = LogLogisticAFTFitter(penalizer=0.30)
 cirrhosis_survival_aft_loglogistic.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
 cirrhosis_survival_aft_loglogistic.print_summary()
 ```
@@ -8459,6 +8976,10 @@ cirrhosis_survival_aft_loglogistic.print_summary()
       <td>'Status'</td>
     </tr>
     <tr>
+      <th>penalizer</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
       <th>number of observations</th>
       <td>218</td>
     </tr>
@@ -8468,11 +8989,11 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>log-likelihood</th>
-      <td>-758.08</td>
+      <td>-781.35</td>
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-29 12:51:28 UTC</td>
+      <td>2024-07-30 08:28:16 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8498,270 +9019,270 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     <tr>
       <th rowspan="18" valign="top">alpha_</th>
       <th>Age</th>
-      <td>-0.25</td>
-      <td>0.78</td>
+      <td>-0.18</td>
+      <td>0.83</td>
       <td>0.08</td>
-      <td>-0.41</td>
-      <td>-0.09</td>
-      <td>0.66</td>
-      <td>0.92</td>
+      <td>-0.33</td>
+      <td>-0.04</td>
+      <td>0.72</td>
+      <td>0.97</td>
       <td>0.00</td>
-      <td>-2.99</td>
-      <td>&lt;0.005</td>
-      <td>8.46</td>
+      <td>-2.42</td>
+      <td>0.02</td>
+      <td>6.02</td>
     </tr>
     <tr>
       <th>Albumin</th>
+      <td>0.10</td>
+      <td>1.10</td>
       <td>0.08</td>
-      <td>1.09</td>
-      <td>0.09</td>
-      <td>-0.09</td>
+      <td>-0.05</td>
       <td>0.25</td>
-      <td>0.92</td>
+      <td>0.95</td>
       <td>1.29</td>
       <td>0.00</td>
-      <td>0.96</td>
-      <td>0.34</td>
-      <td>1.57</td>
+      <td>1.27</td>
+      <td>0.20</td>
+      <td>2.30</td>
     </tr>
     <tr>
       <th>Alk_Phos</th>
-      <td>-0.02</td>
-      <td>0.98</td>
-      <td>0.09</td>
+      <td>-0.05</td>
+      <td>0.95</td>
+      <td>0.08</td>
       <td>-0.20</td>
-      <td>0.15</td>
+      <td>0.11</td>
       <td>0.82</td>
-      <td>1.16</td>
+      <td>1.11</td>
       <td>0.00</td>
-      <td>-0.27</td>
-      <td>0.79</td>
-      <td>0.34</td>
+      <td>-0.60</td>
+      <td>0.55</td>
+      <td>0.87</td>
     </tr>
     <tr>
       <th>Ascites</th>
-      <td>-0.18</td>
-      <td>0.84</td>
-      <td>0.29</td>
-      <td>-0.75</td>
-      <td>0.39</td>
-      <td>0.47</td>
-      <td>1.48</td>
+      <td>-0.29</td>
+      <td>0.75</td>
+      <td>0.28</td>
+      <td>-0.83</td>
+      <td>0.25</td>
+      <td>0.43</td>
+      <td>1.28</td>
       <td>0.00</td>
-      <td>-0.61</td>
-      <td>0.54</td>
-      <td>0.88</td>
+      <td>-1.06</td>
+      <td>0.29</td>
+      <td>1.79</td>
     </tr>
     <tr>
       <th>Bilirubin</th>
-      <td>-0.39</td>
-      <td>0.68</td>
-      <td>0.12</td>
-      <td>-0.63</td>
-      <td>-0.15</td>
-      <td>0.53</td>
-      <td>0.86</td>
+      <td>-0.27</td>
+      <td>0.77</td>
+      <td>0.09</td>
+      <td>-0.44</td>
+      <td>-0.09</td>
+      <td>0.64</td>
+      <td>0.91</td>
       <td>0.00</td>
-      <td>-3.16</td>
+      <td>-3.00</td>
       <td>&lt;0.005</td>
-      <td>9.31</td>
+      <td>8.55</td>
     </tr>
     <tr>
       <th>Cholesterol</th>
-      <td>0.07</td>
-      <td>1.07</td>
-      <td>0.10</td>
-      <td>-0.12</td>
-      <td>0.26</td>
-      <td>0.88</td>
-      <td>1.29</td>
       <td>0.00</td>
-      <td>0.68</td>
-      <td>0.50</td>
-      <td>1.01</td>
+      <td>1.00</td>
+      <td>0.08</td>
+      <td>-0.15</td>
+      <td>0.16</td>
+      <td>0.86</td>
+      <td>1.17</td>
+      <td>0.00</td>
+      <td>0.04</td>
+      <td>0.97</td>
+      <td>0.05</td>
     </tr>
     <tr>
       <th>Copper</th>
-      <td>-0.17</td>
+      <td>-0.16</td>
       <td>0.85</td>
-      <td>0.09</td>
-      <td>-0.35</td>
-      <td>0.01</td>
-      <td>0.71</td>
-      <td>1.01</td>
+      <td>0.08</td>
+      <td>-0.32</td>
+      <td>-0.01</td>
+      <td>0.73</td>
+      <td>0.99</td>
       <td>0.00</td>
-      <td>-1.81</td>
-      <td>0.07</td>
-      <td>3.83</td>
+      <td>-2.05</td>
+      <td>0.04</td>
+      <td>4.64</td>
     </tr>
     <tr>
       <th>Drug</th>
+      <td>0.09</td>
+      <td>1.10</td>
       <td>0.14</td>
-      <td>1.15</td>
-      <td>0.15</td>
-      <td>-0.15</td>
-      <td>0.43</td>
-      <td>0.86</td>
-      <td>1.53</td>
+      <td>-0.19</td>
+      <td>0.38</td>
+      <td>0.83</td>
+      <td>1.46</td>
       <td>0.00</td>
-      <td>0.93</td>
-      <td>0.35</td>
-      <td>1.51</td>
+      <td>0.66</td>
+      <td>0.51</td>
+      <td>0.98</td>
     </tr>
     <tr>
       <th>Edema</th>
-      <td>-0.31</td>
-      <td>0.73</td>
-      <td>0.21</td>
-      <td>-0.72</td>
-      <td>0.09</td>
-      <td>0.49</td>
-      <td>1.10</td>
+      <td>-0.33</td>
+      <td>0.72</td>
+      <td>0.20</td>
+      <td>-0.73</td>
+      <td>0.06</td>
+      <td>0.48</td>
+      <td>1.07</td>
       <td>0.00</td>
-      <td>-1.51</td>
-      <td>0.13</td>
-      <td>2.93</td>
+      <td>-1.65</td>
+      <td>0.10</td>
+      <td>3.32</td>
     </tr>
     <tr>
       <th>Hepatomegaly</th>
-      <td>-0.01</td>
-      <td>0.99</td>
-      <td>0.16</td>
-      <td>-0.34</td>
-      <td>0.31</td>
-      <td>0.71</td>
-      <td>1.36</td>
-      <td>0.00</td>
-      <td>-0.08</td>
-      <td>0.93</td>
-      <td>0.10</td>
-    </tr>
-    <tr>
-      <th>Platelets</th>
-      <td>0.05</td>
-      <td>1.06</td>
-      <td>0.08</td>
-      <td>-0.11</td>
-      <td>0.22</td>
+      <td>-0.10</td>
       <td>0.90</td>
-      <td>1.24</td>
+      <td>0.15</td>
+      <td>-0.40</td>
+      <td>0.20</td>
+      <td>0.67</td>
+      <td>1.22</td>
       <td>0.00</td>
-      <td>0.66</td>
+      <td>-0.66</td>
       <td>0.51</td>
       <td>0.97</td>
     </tr>
     <tr>
+      <th>Platelets</th>
+      <td>0.08</td>
+      <td>1.09</td>
+      <td>0.08</td>
+      <td>-0.07</td>
+      <td>0.23</td>
+      <td>0.94</td>
+      <td>1.26</td>
+      <td>0.00</td>
+      <td>1.09</td>
+      <td>0.27</td>
+      <td>1.87</td>
+    </tr>
+    <tr>
       <th>Prothrombin</th>
-      <td>-0.22</td>
-      <td>0.80</td>
-      <td>0.09</td>
-      <td>-0.39</td>
+      <td>-0.20</td>
+      <td>0.82</td>
+      <td>0.08</td>
+      <td>-0.35</td>
       <td>-0.04</td>
-      <td>0.68</td>
+      <td>0.70</td>
       <td>0.96</td>
       <td>0.00</td>
-      <td>-2.44</td>
+      <td>-2.52</td>
       <td>0.01</td>
-      <td>6.09</td>
+      <td>6.41</td>
     </tr>
     <tr>
       <th>SGOT</th>
-      <td>-0.08</td>
-      <td>0.92</td>
-      <td>0.09</td>
-      <td>-0.26</td>
-      <td>0.10</td>
-      <td>0.77</td>
-      <td>1.11</td>
+      <td>-0.09</td>
+      <td>0.91</td>
+      <td>0.08</td>
+      <td>-0.25</td>
+      <td>0.06</td>
+      <td>0.78</td>
+      <td>1.06</td>
       <td>0.00</td>
-      <td>-0.85</td>
-      <td>0.39</td>
-      <td>1.35</td>
+      <td>-1.19</td>
+      <td>0.23</td>
+      <td>2.09</td>
     </tr>
     <tr>
       <th>Sex</th>
-      <td>0.04</td>
-      <td>1.04</td>
+      <td>0.11</td>
+      <td>1.12</td>
       <td>0.20</td>
-      <td>-0.36</td>
-      <td>0.44</td>
-      <td>0.70</td>
-      <td>1.55</td>
+      <td>-0.29</td>
+      <td>0.51</td>
+      <td>0.75</td>
+      <td>1.66</td>
       <td>0.00</td>
-      <td>0.19</td>
-      <td>0.85</td>
-      <td>0.24</td>
+      <td>0.55</td>
+      <td>0.59</td>
+      <td>0.77</td>
     </tr>
     <tr>
       <th>Spiders</th>
-      <td>-0.17</td>
-      <td>0.85</td>
+      <td>-0.15</td>
+      <td>0.86</td>
+      <td>0.17</td>
+      <td>-0.47</td>
       <td>0.18</td>
-      <td>-0.52</td>
-      <td>0.18</td>
-      <td>0.60</td>
+      <td>0.62</td>
       <td>1.20</td>
       <td>0.00</td>
-      <td>-0.93</td>
-      <td>0.35</td>
-      <td>1.51</td>
+      <td>-0.87</td>
+      <td>0.39</td>
+      <td>1.37</td>
     </tr>
     <tr>
       <th>Stage_4.0</th>
       <td>-0.25</td>
       <td>0.78</td>
-      <td>0.18</td>
-      <td>-0.61</td>
-      <td>0.10</td>
-      <td>0.54</td>
-      <td>1.11</td>
-      <td>0.00</td>
-      <td>-1.38</td>
       <td>0.17</td>
-      <td>2.59</td>
+      <td>-0.57</td>
+      <td>0.08</td>
+      <td>0.57</td>
+      <td>1.08</td>
+      <td>0.00</td>
+      <td>-1.49</td>
+      <td>0.14</td>
+      <td>2.87</td>
     </tr>
     <tr>
       <th>Tryglicerides</th>
-      <td>-0.12</td>
-      <td>0.89</td>
-      <td>0.09</td>
-      <td>-0.30</td>
-      <td>0.06</td>
-      <td>0.74</td>
-      <td>1.06</td>
+      <td>-0.09</td>
+      <td>0.92</td>
+      <td>0.08</td>
+      <td>-0.24</td>
+      <td>0.07</td>
+      <td>0.79</td>
+      <td>1.07</td>
       <td>0.00</td>
-      <td>-1.32</td>
-      <td>0.19</td>
-      <td>2.41</td>
+      <td>-1.11</td>
+      <td>0.27</td>
+      <td>1.90</td>
     </tr>
     <tr>
       <th>Intercept</th>
-      <td>8.20</td>
-      <td>3624.62</td>
+      <td>8.28</td>
+      <td>3927.15</td>
       <td>0.23</td>
-      <td>7.75</td>
-      <td>8.64</td>
-      <td>2319.62</td>
-      <td>5663.82</td>
+      <td>7.82</td>
+      <td>8.73</td>
+      <td>2501.84</td>
+      <td>6164.47</td>
       <td>0.00</td>
-      <td>35.99</td>
+      <td>35.97</td>
       <td>&lt;0.005</td>
-      <td>939.71</td>
+      <td>938.99</td>
     </tr>
     <tr>
       <th>beta_</th>
       <th>Intercept</th>
-      <td>0.78</td>
-      <td>2.19</td>
-      <td>0.09</td>
-      <td>0.61</td>
-      <td>0.96</td>
-      <td>1.84</td>
-      <td>2.61</td>
+      <td>0.51</td>
+      <td>1.67</td>
+      <td>0.08</td>
+      <td>0.36</td>
+      <td>0.67</td>
+      <td>1.43</td>
+      <td>1.95</td>
       <td>0.00</td>
-      <td>8.78</td>
+      <td>6.46</td>
       <td>&lt;0.005</td>
-      <td>59.10</td>
+      <td>33.18</td>
     </tr>
   </tbody>
 </table><br><div>
@@ -8782,19 +9303,19 @@ cirrhosis_survival_aft_loglogistic.print_summary()
   <tbody>
     <tr>
       <th>Concordance</th>
-      <td>0.85</td>
+      <td>0.86</td>
     </tr>
     <tr>
       <th>AIC</th>
-      <td>1554.16</td>
+      <td>1600.71</td>
     </tr>
     <tr>
       <th>log-likelihood ratio test</th>
-      <td>142.13 on 17 df</td>
+      <td>95.58 on 17 df</td>
     </tr>
     <tr>
       <th>-log2(p) of ll-ratio test</th>
-      <td>70.01</td>
+      <td>40.64</td>
     </tr>
   </tbody>
 </table>
@@ -8830,7 +9351,226 @@ plt.show()
 
 
     
-![png](output_169_0.png)
+![png](output_184_0.png)
+    
+
+
+
+```python
+##################################
+# Determining the number of
+# significant predictors
+##################################
+cirrhosis_survival_aft_loglogistic_significant = sum(cirrhosis_survival_aft_loglogistic_summary['p'] < 0.05)
+display(f"Number of Significant Predictors: {cirrhosis_survival_aft_loglogistic_significant-2}")
+```
+
+
+    'Number of Significant Predictors: 4'
+
+
+
+```python
+##################################
+# Gathering the apparent model performance
+# as baseline for evaluating overfitting
+##################################
+cirrhosis_survival_aft_loglogistic.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+train_predictions = cirrhosis_survival_aft_loglogistic.predict_median(cirrhosis_survival_train_modeling)
+cirrhosis_survival_aft_loglogistic_train_ci = concordance_index(cirrhosis_survival_train_modeling['N_Days'], 
+                                                            train_predictions, 
+                                                            cirrhosis_survival_train_modeling['Status'])
+time_point = cirrhosis_survival_train_modeling['N_Days'].median()
+cirrhosis_survival_aft_loglogistic_train_mae = mean_absolute_error(cirrhosis_survival_train_modeling['N_Days'], train_predictions)
+cirrhosis_survival_aft_loglogistic_train_brier = brier_score_loss(cirrhosis_survival_train_modeling['Status'], 
+                                                              cirrhosis_survival_aft_loglogistic.predict_survival_function(cirrhosis_survival_train_modeling, 
+                                                                                                                       times=[time_point]).T[time_point])
+display(f"Apparent Concordance Index: {cirrhosis_survival_aft_loglogistic_train_ci}")
+display(f"Apparent MAE: {cirrhosis_survival_aft_loglogistic_train_mae}")
+display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_train_brier}")
+```
+
+
+    'Apparent Concordance Index: 0.8551690507152145'
+
+
+
+    'Apparent MAE: 3219.26580614041'
+
+
+
+    'Apparent Brier Score: 0.5434035341542703'
+
+
+
+```python
+##################################
+# Performing 5-Fold Cross-Validation
+# on the training data
+##################################
+kf = KFold(n_splits=5, shuffle=True, random_state=88888888)
+ci_scores = []
+mae_scores = []
+brier_scores = []
+
+for train_index, val_index in kf.split(cirrhosis_survival_train_modeling):
+    df_train_fold = cirrhosis_survival_train_modeling.iloc[train_index]
+    df_val_fold = cirrhosis_survival_train_modeling.iloc[val_index]
+    
+    cirrhosis_survival_aft_loglogistic.fit(df_train_fold, duration_col='N_Days', event_col='Status')
+    val_predictions = cirrhosis_survival_aft_loglogistic.predict_median(df_val_fold)
+    time_point = df_val_fold['N_Days'].median()
+    ci = concordance_index(df_val_fold['N_Days'], val_predictions, df_val_fold['Status'])
+    mae = mean_absolute_error(df_val_fold['N_Days'], val_predictions)
+    brier = brier_score_loss(df_val_fold['Status'],
+                             cirrhosis_survival_aft_loglogistic.predict_survival_function(df_val_fold, 
+                                                                                      times=[time_point]).T[time_point])
+    ci_scores.append(ci)
+    mae_scores.append(mae)
+    brier_scores.append(brier)
+
+cirrhosis_survival_aft_loglogistic_cv_ci_mean = np.mean(ci_scores)
+cirrhosis_survival_aft_loglogistic_cv_ci_std = np.std(ci_scores)
+cirrhosis_survival_aft_loglogistic_cv_mae_mean = np.mean(mae_scores)
+cirrhosis_survival_aft_loglogistic_cv_brier_mean = np.mean(brier_scores)
+
+display(f"Cross-Validated Concordance Index: {cirrhosis_survival_aft_loglogistic_cv_ci_mean}")
+display(f"Cross-Validated MAE: {cirrhosis_survival_aft_loglogistic_cv_mae_mean}")
+display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_loglogistic_cv_brier_mean}")
+```
+
+
+    'Cross-Validated Concordance Index: 0.8199806213584104'
+
+
+
+    'Cross-Validated MAE: 3286.319389449709'
+
+
+
+    'Cross-Validated Brier Score: 0.535382409664783'
+
+
+
+```python
+##################################
+# Evaluating the model performance
+# on test data
+##################################
+test_predictions = cirrhosis_survival_aft_loglogistic.predict_median(cirrhosis_survival_test_modeling)
+cirrhosis_survival_aft_loglogistic_test_ci = concordance_index(cirrhosis_survival_test_modeling['N_Days'], 
+                                                           test_predictions, 
+                                                           cirrhosis_survival_test_modeling['Status'])
+time_point = cirrhosis_survival_test_modeling['N_Days'].median()
+cirrhosis_survival_aft_loglogistic_test_mae = mean_absolute_error(cirrhosis_survival_test_modeling['N_Days'], test_predictions)
+cirrhosis_survival_aft_loglogistic_test_brier = brier_score_loss(cirrhosis_survival_test_modeling['Status'], 
+                                                              cirrhosis_survival_aft_loglogistic.predict_survival_function(cirrhosis_survival_test_modeling, 
+                                                                                                                       times=[time_point]).T[time_point])
+display(f"Apparent Concordance Index: {cirrhosis_survival_aft_loglogistic_test_ci}")
+display(f"Apparent MAE: {cirrhosis_survival_aft_loglogistic_test_mae}")
+display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_test_brier}")
+```
+
+
+    'Apparent Concordance Index: 0.8802721088435375'
+
+
+
+    'Apparent MAE: 2388.7013564558247'
+
+
+
+    'Apparent Brier Score: 0.5712439252494961'
+
+
+
+```python
+##################################
+# Gathering the concordance indices
+# from training, cross-validation and test
+##################################
+coxph_aft_loglogistic_set = pd.DataFrame(["Train","Cross-Validation","Test"])
+coxph_aft_loglogistic_ci_values = pd.DataFrame([cirrhosis_survival_aft_loglogistic_train_ci,
+                                           cirrhosis_survival_aft_loglogistic_cv_ci_mean,
+                                           cirrhosis_survival_aft_loglogistic_test_ci])
+coxph_aft_loglogistic_method = pd.DataFrame(["AFT_LOGLOGISTIC"]*3)
+coxph_aft_loglogistic_summary = pd.concat([coxph_aft_loglogistic_set, 
+                                       coxph_aft_loglogistic_ci_values,
+                                       coxph_aft_loglogistic_method], 
+                                      axis=1)
+coxph_aft_loglogistic_summary.columns = ['Set', 'Concordance.Index', 'Method']
+coxph_aft_loglogistic_summary.reset_index(inplace=True, drop=True)
+display(coxph_aft_loglogistic_summary)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Set</th>
+      <th>Concordance.Index</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Train</td>
+      <td>0.855169</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Cross-Validation</td>
+      <td>0.819981</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Test</td>
+      <td>0.880272</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the predicted
+# and actual survival times
+##################################
+predicted_survival_times = cirrhosis_survival_aft_loglogistic.predict_median(cirrhosis_survival_test_modeling)
+plt.figure(figsize=(17, 8))
+plt.scatter(cirrhosis_survival_test_modeling['N_Days'], predicted_survival_times)
+plt.xlabel('Actual Survival Time')
+plt.ylabel('Predicted Survival Time')
+plt.title('AFT_LOGLOGISTIC: Predicted Versus Actual Survival Times')
+plt.plot([cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 
+         [cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 'k--')
+plt.show()
+```
+
+
+    
+![png](output_190_0.png)
     
 
 
