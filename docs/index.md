@@ -7648,7 +7648,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-30 13:49:26 UTC</td>
+      <td>2024-07-31 13:01:11 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8267,13 +8267,17 @@ display(coxph_aft_weibull_summary)
 # and actual survival times
 ##################################
 predicted_survival_times = cirrhosis_survival_aft_weibull.predict_median(cirrhosis_survival_test_modeling)
-plt.figure(figsize=(17, 8))
-plt.scatter(cirrhosis_survival_test_modeling['N_Days'], predicted_survival_times)
-plt.xlabel('Actual Survival Time')
-plt.ylabel('Predicted Survival Time')
-plt.title('AFT_WEIBULL: Predicted Versus Actual Survival Times')
-plt.plot([cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 
-         [cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 'k--')
+fig, ax = plt.subplots(figsize=(17, 8))
+for status, color, label in zip([True, False], ['#FF7F0E','#1F77B4'], ['Death', 'Censored']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Status'] == status]
+    ax.scatter(subset['N_Days'], predicted_survival_times.iloc[subset.index], c=color, label=label, alpha=0.8)
+ax.set_xlabel('Actual Survival Time')
+ax.set_ylabel('Predicted Survival Time')
+ax.set_title('AFT_WEIBULL: Predicted Versus Actual Survival Times')
+ax.legend()
+plt.plot([0, cirrhosis_survival_test_modeling['N_Days'].max()], 
+         [0, cirrhosis_survival_test_modeling['N_Days'].max()], 
+         color='black', linestyle='--')
 plt.show()
 ```
 
@@ -8285,18 +8289,29 @@ plt.show()
 
 
 ```python
-cirrhosis_survival_train_modeling.columns
+##################################
+# Plotting the individual
+# survival probability profiles
+##################################
+plt.figure(figsize=(17, 8))
+for status, color, label in zip([True, False], ['#FF7F0E','#1F77B4'], ['Death', 'Censored']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Status'] == status]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_weibull.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_WEIBULL: Survival Probability Profiles')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+death_patch = plt.Line2D([0], [0], color='#FF7F0E', lw=2, label='Death')
+censored_patch = plt.Line2D([0], [0], color='#1F77B4', lw=2, label='Censored')
+plt.legend(handles=[death_patch, censored_patch])
+plt.show()
 ```
 
 
-
-
-    Index(['Status', 'N_Days', 'Age', 'Bilirubin', 'Cholesterol', 'Albumin',
-           'Copper', 'Alk_Phos', 'SGOT', 'Tryglicerides', 'Platelets',
-           'Prothrombin', 'Drug', 'Sex', 'Ascites', 'Hepatomegaly', 'Spiders',
-           'Edema', 'Stage_4.0'],
-          dtype='object')
-
+    
+![png](output_171_0.png)
+    
 
 
 
@@ -8317,7 +8332,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:31,  5.44it/s]                         
+    PermutationExplainer explainer: 219it [00:26,  5.83it/s]                         
     
 
 
@@ -8427,7 +8442,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-30 13:50:02 UTC</td>
+      <td>2024-07-31 13:01:43 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9046,19 +9061,50 @@ display(coxph_aft_lognormal_summary)
 # and actual survival times
 ##################################
 predicted_survival_times = cirrhosis_survival_aft_lognormal.predict_median(cirrhosis_survival_test_modeling)
-plt.figure(figsize=(17, 8))
-plt.scatter(cirrhosis_survival_test_modeling['N_Days'], predicted_survival_times)
-plt.xlabel('Actual Survival Time')
-plt.ylabel('Predicted Survival Time')
-plt.title('AFT_LOGNORMAL: Predicted Versus Actual Survival Times')
-plt.plot([cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 
-         [cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 'k--')
+fig, ax = plt.subplots(figsize=(17, 8))
+for status, color, label in zip([True, False], ['#FF7F0E','#1F77B4'], ['Death', 'Censored']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Status'] == status]
+    ax.scatter(subset['N_Days'], predicted_survival_times.iloc[subset.index], c=color, label=label, alpha=0.8)
+ax.set_xlabel('Actual Survival Time')
+ax.set_ylabel('Predicted Survival Time')
+ax.set_title('AFT_LOGNORMAL: Predicted Versus Actual Survival Times')
+ax.legend()
+plt.plot([0, cirrhosis_survival_test_modeling['N_Days'].max()], 
+         [0, cirrhosis_survival_test_modeling['N_Days'].max()], 
+         color='black', linestyle='--')
 plt.show()
 ```
 
 
     
 ![png](output_183_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+##################################
+plt.figure(figsize=(17, 8))
+for status, color, label in zip([True, False], ['#FF7F0E','#1F77B4'], ['Death', 'Censored']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Status'] == status]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_lognormal.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGNORMAL: Survival Probability Profiles')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+death_patch = plt.Line2D([0], [0], color='#FF7F0E', lw=2, label='Death')
+censored_patch = plt.Line2D([0], [0], color='#1F77B4', lw=2, label='Censored')
+plt.legend(handles=[death_patch, censored_patch])
+plt.show()
+```
+
+
+    
+![png](output_184_0.png)
     
 
 
@@ -9081,7 +9127,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:25,  4.74it/s]                         
+    PermutationExplainer explainer: 219it [00:21,  6.05it/s]                         
     
 
 
@@ -9095,7 +9141,7 @@ shap.summary_plot(shap_values_lognormal,
 
 
     
-![png](output_185_0.png)
+![png](output_186_0.png)
     
 
 
@@ -9128,7 +9174,7 @@ plt.show()
 
 
     
-![png](output_187_0.png)
+![png](output_188_0.png)
     
 
 
@@ -9191,7 +9237,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-30 13:50:33 UTC</td>
+      <td>2024-07-31 13:02:09 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9549,7 +9595,7 @@ plt.show()
 
 
     
-![png](output_189_0.png)
+![png](output_190_0.png)
     
 
 
@@ -9810,19 +9856,50 @@ display(coxph_aft_loglogistic_summary)
 # and actual survival times
 ##################################
 predicted_survival_times = cirrhosis_survival_aft_loglogistic.predict_median(cirrhosis_survival_test_modeling)
-plt.figure(figsize=(17, 8))
-plt.scatter(cirrhosis_survival_test_modeling['N_Days'], predicted_survival_times)
-plt.xlabel('Actual Survival Time')
-plt.ylabel('Predicted Survival Time')
-plt.title('AFT_LOGLOGISTIC: Predicted Versus Actual Survival Times')
-plt.plot([cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 
-         [cirrhosis_survival_test_modeling['N_Days'].min(), cirrhosis_survival_test_modeling['N_Days'].max()], 'k--')
+fig, ax = plt.subplots(figsize=(17, 8))
+for status, color, label in zip([True, False], ['#FF7F0E','#1F77B4'], ['Death', 'Censored']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Status'] == status]
+    ax.scatter(subset['N_Days'], predicted_survival_times.iloc[subset.index], c=color, label=label, alpha=0.8)
+ax.set_xlabel('Actual Survival Time')
+ax.set_ylabel('Predicted Survival Time')
+ax.set_title('AFT_LOGLOGISTIC: Predicted Versus Actual Survival Times')
+ax.legend()
+plt.plot([0, cirrhosis_survival_test_modeling['N_Days'].max()], 
+         [0, cirrhosis_survival_test_modeling['N_Days'].max()], 
+         color='black', linestyle='--')
 plt.show()
 ```
 
 
     
-![png](output_195_0.png)
+![png](output_196_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+##################################
+plt.figure(figsize=(17, 8))
+for status, color, label in zip([True, False], ['#FF7F0E','#1F77B4'], ['Death', 'Censored']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Status'] == status]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_loglogistic.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGLOGISTIC: Survival Probability Profiles')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+death_patch = plt.Line2D([0], [0], color='#FF7F0E', lw=2, label='Death')
+censored_patch = plt.Line2D([0], [0], color='#1F77B4', lw=2, label='Censored')
+plt.legend(handles=[death_patch, censored_patch])
+plt.show()
+```
+
+
+    
+![png](output_197_0.png)
     
 
 
@@ -9844,7 +9921,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:24,  5.32it/s]                         
+    PermutationExplainer explainer: 219it [00:17,  5.20it/s]                         
     
 
 
@@ -9858,7 +9935,7 @@ shap.summary_plot(shap_values_loglogistic,
 
 
     
-![png](output_197_0.png)
+![png](output_199_0.png)
     
 
 
