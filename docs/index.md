@@ -7648,7 +7648,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 05:29:49 UTC</td>
+      <td>2024-08-01 07:10:10 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8084,7 +8084,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 05:29:50 UTC</td>
+      <td>2024-08-01 07:10:11 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8543,6 +8543,96 @@ plt.show()
 
 ```python
 ##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Bilirubin predictor
+##################################
+cirrhosis_survival_test_modeling['Bilirubin_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Bilirubin'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for bilirubin_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Bilirubin_Level'] == bilirubin_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_weibull.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_WEIBULL: Survival Probability Profiles by Bilirubin Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_174_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Prothrombin predictor
+##################################
+cirrhosis_survival_test_modeling['Prothrombin_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Prothrombin'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for prothrombin_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Prothrombin_Level'] == prothrombin_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_weibull.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_WEIBULL: Survival Probability Profiles by Prothrombin Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_175_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Age predictor
+##################################
+cirrhosis_survival_test_modeling['Age_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Age'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for age_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Age_Level'] == age_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_weibull.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_WEIBULL: Survival Probability Profiles by Age Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_176_0.png)
+    
+
+
+
+```python
+##################################
 # Defining a prediction function
 # for SHAP value estimation
 ##################################
@@ -8558,7 +8648,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:27,  5.83it/s]                         
+    PermutationExplainer explainer: 219it [00:55,  3.56it/s]                         
     
 
 
@@ -8572,7 +8662,7 @@ shap.summary_plot(shap_values_weibull,
 
 
     
-![png](output_175_0.png)
+![png](output_178_0.png)
     
 
 
@@ -8605,7 +8695,7 @@ plt.show()
 
 
     
-![png](output_177_0.png)
+![png](output_180_0.png)
     
 
 
@@ -8668,7 +8758,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 05:30:22 UTC</td>
+      <td>2024-08-01 07:11:24 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9025,7 +9115,7 @@ plt.show()
 
 
     
-![png](output_179_0.png)
+![png](output_182_0.png)
     
 
 
@@ -9104,7 +9194,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 05:30:23 UTC</td>
+      <td>2024-08-01 07:11:25 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9294,7 +9384,7 @@ plt.show()
 
 
     
-![png](output_182_0.png)
+![png](output_185_0.png)
     
 
 
@@ -9558,7 +9648,7 @@ plt.show()
 
 
     
-![png](output_187_0.png)
+![png](output_190_0.png)
     
 
 
@@ -9585,7 +9675,155 @@ plt.show()
 
 
     
-![png](output_188_0.png)
+![png](output_191_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Edema predictor
+##################################
+plt.figure(figsize=(17, 8))
+for edema_level, color, label in zip([0, 1], ['#FA8000', '#8C000F'], ['Not Present', 'Present']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Edema'] == edema_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_lognormal.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGNORMAL: Survival Probability Profiles by Edema Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+not_present_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Not Present')
+present_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='Present')
+plt.legend(handles=[not_present_patch, present_patch])
+plt.show()
+```
+
+
+    
+![png](output_192_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Bilirubin predictor
+##################################
+cirrhosis_survival_test_modeling['Bilirubin_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Bilirubin'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for bilirubin_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Bilirubin_Level'] == bilirubin_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_lognormal.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGNORMAL: Survival Probability Profiles by Bilirubin Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_193_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Prothrombin predictor
+##################################
+cirrhosis_survival_test_modeling['Prothrombin_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Prothrombin'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for prothrombin_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Prothrombin_Level'] == prothrombin_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_lognormal.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGNORMAL: Survival Probability Profiles by Prothrombin Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_194_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Copper predictor
+##################################
+cirrhosis_survival_test_modeling['Copper_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Copper'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for copper_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Copper_Level'] == copper_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_lognormal.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGNORMAL: Survival Probability Profiles by Copper Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_195_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Age predictor
+##################################
+cirrhosis_survival_test_modeling['Age_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Age'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for age_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Age_Level'] == age_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_lognormal.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGNORMAL: Survival Probability Profiles by Age Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_196_0.png)
     
 
 
@@ -9608,7 +9846,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:24,  5.22it/s]                         
+    PermutationExplainer explainer: 219it [00:47,  3.57it/s]                         
     
 
 
@@ -9622,7 +9860,7 @@ shap.summary_plot(shap_values_lognormal,
 
 
     
-![png](output_190_0.png)
+![png](output_198_0.png)
     
 
 
@@ -9655,7 +9893,7 @@ plt.show()
 
 
     
-![png](output_192_0.png)
+![png](output_200_0.png)
     
 
 
@@ -9718,7 +9956,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 05:30:54 UTC</td>
+      <td>2024-08-01 07:12:33 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10075,7 +10313,7 @@ plt.show()
 
 
     
-![png](output_194_0.png)
+![png](output_202_0.png)
     
 
 
@@ -10154,7 +10392,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 05:30:55 UTC</td>
+      <td>2024-08-01 07:12:35 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10330,7 +10568,7 @@ plt.show()
 
 
     
-![png](output_197_0.png)
+![png](output_205_0.png)
     
 
 
@@ -10593,7 +10831,7 @@ plt.show()
 
 
     
-![png](output_202_0.png)
+![png](output_210_0.png)
     
 
 
@@ -10620,7 +10858,127 @@ plt.show()
 
 
     
-![png](output_203_0.png)
+![png](output_211_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Bilirubin predictor
+##################################
+cirrhosis_survival_test_modeling['Bilirubin_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Bilirubin'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for bilirubin_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Bilirubin_Level'] == bilirubin_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_loglogistic.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGLOGISTIC: Survival Probability Profiles by Bilirubin Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_212_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Prothrombin predictor
+##################################
+cirrhosis_survival_test_modeling['Prothrombin_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Prothrombin'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for prothrombin_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Prothrombin_Level'] == prothrombin_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_loglogistic.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGLOGISTIC: Survival Probability Profiles by Prothrombin Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_213_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Copper predictor
+##################################
+cirrhosis_survival_test_modeling['Copper_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Copper'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for copper_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Copper_Level'] == copper_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_loglogistic.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGLOGISTIC: Survival Probability Profiles by Copper Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_214_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the individual
+# survival probability profiles
+# for the discretized Age predictor
+##################################
+cirrhosis_survival_test_modeling['Age_Level'] = pd.qcut(cirrhosis_survival_test_modeling['Age'], 3, labels=['Low','Moderate','High'])
+plt.figure(figsize=(17, 8))
+for age_level, color, label in zip(['Low', 'Moderate', 'High'], ['#FA8000','#E50000', '#8C000F'], ['Low', 'Moderate', 'High']):
+    subset = cirrhosis_survival_test_modeling[cirrhosis_survival_test_modeling['Age_Level'] == age_level]
+    for i, row in subset.iterrows():
+        survival_function = cirrhosis_survival_aft_loglogistic.predict_survival_function(row)
+        plt.plot(survival_function.index, survival_function.iloc[:, 0], c=color, alpha=0.8)
+plt.title('AFT_LOGLOGISTIC: Survival Probability Profiles by Age Level')
+plt.xlabel('N_Days')
+plt.ylabel('Survival Probability')
+low_patch = plt.Line2D([0], [0], color='#FA8000', lw=2, label='Low')
+moderate_patch = plt.Line2D([0], [0], color='#E50000', lw=2, label='Moderate')
+high_patch = plt.Line2D([0], [0], color='#8C000F', lw=2, label='High')
+plt.legend(handles=[low_patch, moderate_patch, high_patch])
+plt.show()
+```
+
+
+    
+![png](output_215_0.png)
     
 
 
@@ -10642,7 +11000,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:24,  5.39it/s]                         
+    PermutationExplainer explainer: 219it [00:47,  3.59it/s]                         
     
 
 
@@ -10656,7 +11014,7 @@ shap.summary_plot(shap_values_loglogistic,
 
 
     
-![png](output_205_0.png)
+![png](output_217_0.png)
     
 
 
@@ -10996,7 +11354,7 @@ display(ci_plot)
 ##################################
 ci_plot = ci_plot.plot.barh(figsize=(10, 6), width=0.90)
 ci_plot.set_xlim(0.00,1.00)
-ci_plot.set_title("Model Comparison by Concordance Indices")
+ci_plot.set_title("Model Comparison by Concordance Indice")
 ci_plot.set_xlabel("Concordance Index")
 ci_plot.set_ylabel("Data Set")
 ci_plot.grid(False)
@@ -11007,7 +11365,225 @@ for container in ci_plot.containers:
 
 
     
-![png](output_210_0.png)
+![png](output_222_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating the mean absolute errors
+# for all sets and models
+##################################
+set_labels = ['Train','Cross-Validation','Test']
+aft_weibull_mae = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='MAE') &
+                                              (model_performance_comparison['Method']=='AFT_WEIBULL')]['Value'].values
+aft_lognormal_mae = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='MAE') &
+                                              (model_performance_comparison['Method']=='AFT_LOGNORMAL')]['Value'].values
+aft_loglogistic_mae = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='MAE') &
+                                              (model_performance_comparison['Method']=='AFT_LOGLOGISTIC')]['Value'].values
+```
+
+
+```python
+##################################
+# Plotting the values for the
+# mean absolute errors
+# for all models
+##################################
+mae_plot = pd.DataFrame({'AFT_WEIBULL': list(aft_weibull_mae),
+                         'AFT_LOGNORMAL': list(aft_lognormal_mae),
+                         'AFT_LOGLOGISTIC': list(aft_loglogistic_mae)},
+                       index = set_labels)
+display(mae_plot)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>AFT_WEIBULL</th>
+      <th>AFT_LOGNORMAL</th>
+      <th>AFT_LOGLOGISTIC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Train</th>
+      <td>2280.743783</td>
+      <td>2518.359385</td>
+      <td>2727.465086</td>
+    </tr>
+    <tr>
+      <th>Cross-Validation</th>
+      <td>2303.605628</td>
+      <td>2502.636955</td>
+      <td>2711.660486</td>
+    </tr>
+    <tr>
+      <th>Test</th>
+      <td>1948.873380</td>
+      <td>1904.987987</td>
+      <td>2189.932314</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting all the mean absolute errors
+# for all models
+##################################
+mae_plot = mae_plot.plot.barh(figsize=(10, 6), width=0.90)
+mae_plot.set_xlim(0.00,3000.00)
+mae_plot.set_title("Model Comparison by Mean Absolute Error")
+mae_plot.set_xlabel("Mean Absolute Error")
+mae_plot.set_ylabel("Data Set")
+mae_plot.grid(False)
+mae_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in mae_plot.containers:
+    mae_plot.bar_label(container, fmt='%.5f', padding=-75, color='white', fontweight='bold')
+```
+
+
+    
+![png](output_225_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating the brier scores
+# for all sets and models
+##################################
+set_labels = ['Train','Cross-Validation','Test']
+aft_weibull_brier_score = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='Brier.Score') &
+                                              (model_performance_comparison['Method']=='AFT_WEIBULL')]['Value'].values
+aft_lognormal_brier_score = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='Brier.Score') &
+                                              (model_performance_comparison['Method']=='AFT_LOGNORMAL')]['Value'].values
+aft_loglogistic_brier_score = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='Brier.Score') &
+                                              (model_performance_comparison['Method']=='AFT_LOGLOGISTIC')]['Value'].values
+```
+
+
+```python
+##################################
+# Plotting the values for the
+# brier scores
+# for all models
+##################################
+brier_score_plot = pd.DataFrame({'AFT_WEIBULL': list(aft_weibull_brier_score),
+                                 'AFT_LOGNORMAL': list(aft_lognormal_brier_score),
+                                 'AFT_LOGLOGISTIC': list(aft_loglogistic_brier_score)},
+                       index = set_labels)
+display(brier_score_plot)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>AFT_WEIBULL</th>
+      <th>AFT_LOGNORMAL</th>
+      <th>AFT_LOGLOGISTIC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Train</th>
+      <td>0.515148</td>
+      <td>0.547041</td>
+      <td>0.509528</td>
+    </tr>
+    <tr>
+      <th>Cross-Validation</th>
+      <td>0.512583</td>
+      <td>0.542583</td>
+      <td>0.506538</td>
+    </tr>
+    <tr>
+      <th>Test</th>
+      <td>0.537556</td>
+      <td>0.577502</td>
+      <td>0.533296</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting all the mean absolute errors
+# for all models
+##################################
+brier_score_plot = brier_score_plot.plot.barh(figsize=(10, 6), width=0.90)
+brier_score_plot.set_xlim(0.00,1.00)
+brier_score_plot.set_title("Model Comparison by Brier Score")
+brier_score_plot.set_xlabel("Brier Score")
+brier_score_plot.set_ylabel("Data Set")
+brier_score_plot.grid(False)
+brier_score_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in brier_score_plot.containers:
+    brier_score_plot.bar_label(container, fmt='%.5f', padding=-75, color='white', fontweight='bold')
+```
+
+
+    
+![png](output_228_0.png)
     
 
 
