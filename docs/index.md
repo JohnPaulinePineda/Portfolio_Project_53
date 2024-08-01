@@ -2,7 +2,7 @@
 # Supervised Learning : Exploring Parametric Accelerated Failure Time Models for Estimating Lifetimes in Survival Data
 
 ***
-### John Pauline Pineda <br> <br> *July 31, 2024*
+### John Pauline Pineda <br> <br> *August 3, 2024*
 ***
 
 * [**1. Table of Contents**](#TOC)
@@ -7576,7 +7576,7 @@ cirrhosis_survival_test_modeling.head()
 ##################################
 cirrhosis_survival_weibull = WeibullFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
 plt.figure(figsize=(17, 8)) 
-qq_plot(cirrhosis_survival_weibull, plot_kwargs={'marker': 'x', 'color': 'blue'})
+qq_plot(cirrhosis_survival_weibull)
 plt.xlabel('Fitted Weibull Quantiles')
 plt.ylabel('Empirical Quantiles')
 plt.title('QQ Plot: AFT_WEIBULL')
@@ -7648,7 +7648,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-31 13:01:11 UTC</td>
+      <td>2024-08-01 05:29:49 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8026,11 +8026,237 @@ display(f"Number of Significant Predictors: {cirrhosis_survival_aft_weibull_sign
 
 ```python
 ##################################
+# Formulating the Accelerated Failure Time model
+# based on a Weibull distribution,
+# using the significant predictors only
+# and generating the summary
+##################################
+feature_subset = ['Bilirubin','Prothrombin','Age','N_Days','Status']
+cirrhosis_survival_aft_weibull = WeibullAFTFitter(penalizer=0.30)
+cirrhosis_survival_aft_weibull.fit(cirrhosis_survival_train_modeling[feature_subset], duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_weibull.print_summary()
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>model</th>
+      <td>lifelines.WeibullAFTFitter</td>
+    </tr>
+    <tr>
+      <th>duration col</th>
+      <td>'N_Days'</td>
+    </tr>
+    <tr>
+      <th>event col</th>
+      <td>'Status'</td>
+    </tr>
+    <tr>
+      <th>penalizer</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>number of observations</th>
+      <td>218</td>
+    </tr>
+    <tr>
+      <th>number of events observed</th>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>log-likelihood</th>
+      <td>-789.68</td>
+    </tr>
+    <tr>
+      <th>time fit was run</th>
+      <td>2024-08-01 05:29:50 UTC</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;">coef</th>
+      <th style="min-width: 12px;">exp(coef)</th>
+      <th style="min-width: 12px;">se(coef)</th>
+      <th style="min-width: 12px;">coef lower 95%</th>
+      <th style="min-width: 12px;">coef upper 95%</th>
+      <th style="min-width: 12px;">exp(coef) lower 95%</th>
+      <th style="min-width: 12px;">exp(coef) upper 95%</th>
+      <th style="min-width: 12px;">cmp to</th>
+      <th style="min-width: 12px;">z</th>
+      <th style="min-width: 12px;">p</th>
+      <th style="min-width: 12px;">-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="4" valign="top">lambda_</th>
+      <th>Age</th>
+      <td>-0.19</td>
+      <td>0.83</td>
+      <td>0.06</td>
+      <td>-0.31</td>
+      <td>-0.06</td>
+      <td>0.73</td>
+      <td>0.94</td>
+      <td>0.00</td>
+      <td>-2.97</td>
+      <td>&lt;0.005</td>
+      <td>8.40</td>
+    </tr>
+    <tr>
+      <th>Bilirubin</th>
+      <td>-0.51</td>
+      <td>0.60</td>
+      <td>0.07</td>
+      <td>-0.64</td>
+      <td>-0.38</td>
+      <td>0.53</td>
+      <td>0.68</td>
+      <td>0.00</td>
+      <td>-7.56</td>
+      <td>&lt;0.005</td>
+      <td>44.52</td>
+    </tr>
+    <tr>
+      <th>Prothrombin</th>
+      <td>-0.27</td>
+      <td>0.77</td>
+      <td>0.07</td>
+      <td>-0.40</td>
+      <td>-0.13</td>
+      <td>0.67</td>
+      <td>0.88</td>
+      <td>0.00</td>
+      <td>-3.85</td>
+      <td>&lt;0.005</td>
+      <td>13.03</td>
+    </tr>
+    <tr>
+      <th>Intercept</th>
+      <td>8.36</td>
+      <td>4272.85</td>
+      <td>0.09</td>
+      <td>8.19</td>
+      <td>8.53</td>
+      <td>3594.18</td>
+      <td>5079.66</td>
+      <td>0.00</td>
+      <td>94.73</td>
+      <td>&lt;0.005</td>
+      <td>inf</td>
+    </tr>
+    <tr>
+      <th>rho_</th>
+      <th>Intercept</th>
+      <td>0.35</td>
+      <td>1.42</td>
+      <td>0.07</td>
+      <td>0.21</td>
+      <td>0.50</td>
+      <td>1.23</td>
+      <td>1.64</td>
+      <td>0.00</td>
+      <td>4.74</td>
+      <td>&lt;0.005</td>
+      <td>18.81</td>
+    </tr>
+  </tbody>
+</table><br><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>Concordance</th>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <th>AIC</th>
+      <td>1589.35</td>
+    </tr>
+    <tr>
+      <th>log-likelihood ratio test</th>
+      <td>78.11 on 3 df</td>
+    </tr>
+    <tr>
+      <th>-log2(p) of ll-ratio test</th>
+      <td>53.51</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting the log accelerated failure rate of the
+# formulated Accelerated Failure Time model
+# using the significant predictors only
+# based on a Weibull distribution
+##################################
+cirrhosis_survival_aft_weibull_summary = cirrhosis_survival_aft_weibull.summary
+cirrhosis_survival_aft_weibull_summary_params = pd.DataFrame(cirrhosis_survival_aft_weibull.params_)
+significant = cirrhosis_survival_aft_weibull_summary['p'] < 0.05
+cirrhosis_survival_aft_weibull_summary_log_accelerated_failure_rate = (list(cirrhosis_survival_aft_weibull_summary_params.iloc[:,0].values))
+plt.figure(figsize=(17, 8))
+colors = ['#993300' if sig else '#CC9966' for sig in significant]
+
+plt.barh([(index[0] + index[1]) for index in cirrhosis_survival_aft_weibull_summary_params.index[0:3]], 
+         cirrhosis_survival_aft_weibull_summary_log_accelerated_failure_rate[0:3], 
+         xerr=cirrhosis_survival_aft_weibull_summary['se(coef)'][0:3], 
+         color=colors)
+plt.xlabel('Log(Accelerated Failure Rate)')
+plt.ylabel('Variables')
+plt.title('AFT_WEIBULL Log(Accelerated Failure Rate) Forest Plot')
+plt.axvline(x=0, color='k', linestyle='--')
+plt.gca().invert_yaxis()
+plt.show()
+```
+
+
+    
+![png](output_167_0.png)
+    
+
+
+
+```python
+##################################
 # Gathering the apparent model performance
 # as baseline for evaluating overfitting
 ##################################
-features_significant = ['Bilirubin','Prothrombin','Age','N_Days','Status']
-cirrhosis_survival_aft_weibull.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_weibull.fit(cirrhosis_survival_train_modeling[feature_subset], duration_col='N_Days', event_col='Status')
 train_predictions = cirrhosis_survival_aft_weibull.predict_median(cirrhosis_survival_train_modeling)
 cirrhosis_survival_aft_weibull_train_ci = concordance_index(cirrhosis_survival_train_modeling['N_Days'], 
                                                             train_predictions, 
@@ -8046,15 +8272,15 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_train_brier}")
 ```
 
 
-    'Apparent Concordance Index: 0.8525682704811444'
+    'Apparent Concordance Index: 0.8290799739921977'
 
 
 
-    'Apparent MAE: 2805.6130546583813'
+    'Apparent MAE: 2280.743783352583'
 
 
 
-    'Apparent Brier Score: 0.542714145030189'
+    'Apparent Brier Score: 0.5151484140783107'
 
 
 
@@ -8072,7 +8298,7 @@ for train_index, val_index in kf.split(cirrhosis_survival_train_modeling):
     df_train_fold = cirrhosis_survival_train_modeling.iloc[train_index]
     df_val_fold = cirrhosis_survival_train_modeling.iloc[val_index]
     
-    cirrhosis_survival_aft_weibull.fit(df_train_fold, duration_col='N_Days', event_col='Status')
+    cirrhosis_survival_aft_weibull.fit(df_train_fold[feature_subset], duration_col='N_Days', event_col='Status')
     val_predictions = cirrhosis_survival_aft_weibull.predict_median(df_val_fold)
     time_point = df_val_fold['N_Days'].median()
     ci = concordance_index(df_val_fold['N_Days'], val_predictions, df_val_fold['Status'])
@@ -8095,15 +8321,15 @@ display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_weibull_cv_brier_
 ```
 
 
-    'Cross-Validated Concordance Index: 0.812420042883874'
+    'Cross-Validated Concordance Index: 0.82500812019991'
 
 
 
-    'Cross-Validated MAE: 2931.480821658067'
+    'Cross-Validated MAE: 2303.6056275460082'
 
 
 
-    'Cross-Validated Brier Score: 0.534747947646952'
+    'Cross-Validated Brier Score: 0.5125825238516043'
 
 
 
@@ -8127,15 +8353,15 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_test_brier}")
 ```
 
 
-    'Apparent Concordance Index: 0.8702947845804989'
+    'Apparent Concordance Index: 0.8526077097505669'
 
 
 
-    'Apparent MAE: 2211.5902990130917'
+    'Apparent MAE: 1948.87338022389'
 
 
 
-    'Apparent Brier Score: 0.5713669839968856'
+    'Apparent Brier Score: 0.5375559341601057'
 
 
 
@@ -8144,9 +8370,9 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_test_brier}")
 # Gathering the model performance metrics
 # from training, cross-validation and test
 ##################################
-coxph_aft_weibull_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
-coxph_aft_weibull_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
-coxph_aft_weibull_metric_values = pd.DataFrame([cirrhosis_survival_aft_weibull_train_ci,
+aft_weibull_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
+aft_weibull_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
+aft_weibull_metric_values = pd.DataFrame([cirrhosis_survival_aft_weibull_train_ci,
                                            cirrhosis_survival_aft_weibull_cv_ci_mean,
                                            cirrhosis_survival_aft_weibull_test_ci,
                                            cirrhosis_survival_aft_weibull_train_mae,
@@ -8155,15 +8381,15 @@ coxph_aft_weibull_metric_values = pd.DataFrame([cirrhosis_survival_aft_weibull_t
                                            cirrhosis_survival_aft_weibull_train_brier,
                                            cirrhosis_survival_aft_weibull_cv_brier_mean,
                                            cirrhosis_survival_aft_weibull_test_brier])
-coxph_aft_weibull_method = pd.DataFrame(["AFT_WEIBULL"]*9)
-coxph_aft_weibull_summary = pd.concat([coxph_aft_weibull_set,
-                                       coxph_aft_weibull_metric,
-                                       coxph_aft_weibull_metric_values,
-                                       coxph_aft_weibull_method], 
+aft_weibull_method = pd.DataFrame(["AFT_WEIBULL"]*9)
+aft_weibull_summary = pd.concat([aft_weibull_set,
+                                       aft_weibull_metric,
+                                       aft_weibull_metric_values,
+                                       aft_weibull_method], 
                                       axis=1)
-coxph_aft_weibull_summary.columns = ['Set', 'Metric', 'Value', 'Method']
-coxph_aft_weibull_summary.reset_index(inplace=True, drop=True)
-display(coxph_aft_weibull_summary)
+aft_weibull_summary.columns = ['Set', 'Metric', 'Value', 'Method']
+aft_weibull_summary.reset_index(inplace=True, drop=True)
+display(aft_weibull_summary)
 ```
 
 
@@ -8196,63 +8422,63 @@ display(coxph_aft_weibull_summary)
       <th>0</th>
       <td>Train</td>
       <td>Concordance.Index</td>
-      <td>0.852568</td>
+      <td>0.829080</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Cross-Validation</td>
       <td>Concordance.Index</td>
-      <td>0.812420</td>
+      <td>0.825008</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Test</td>
       <td>Concordance.Index</td>
-      <td>0.870295</td>
+      <td>0.852608</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Train</td>
       <td>MAE</td>
-      <td>2805.613055</td>
+      <td>2280.743783</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Cross-Validation</td>
       <td>MAE</td>
-      <td>2931.480822</td>
+      <td>2303.605628</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>5</th>
       <td>Test</td>
       <td>MAE</td>
-      <td>2211.590299</td>
+      <td>1948.873380</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>6</th>
       <td>Train</td>
       <td>Brier.Score</td>
-      <td>0.542714</td>
+      <td>0.515148</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>7</th>
       <td>Cross-Validation</td>
       <td>Brier.Score</td>
-      <td>0.534748</td>
+      <td>0.512583</td>
       <td>AFT_WEIBULL</td>
     </tr>
     <tr>
       <th>8</th>
       <td>Test</td>
       <td>Brier.Score</td>
-      <td>0.571367</td>
+      <td>0.537556</td>
       <td>AFT_WEIBULL</td>
     </tr>
   </tbody>
@@ -8283,7 +8509,7 @@ plt.show()
 
 
     
-![png](output_170_0.png)
+![png](output_172_0.png)
     
 
 
@@ -8310,7 +8536,7 @@ plt.show()
 
 
     
-![png](output_171_0.png)
+![png](output_173_0.png)
     
 
 
@@ -8332,7 +8558,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:26,  5.83it/s]                         
+    PermutationExplainer explainer: 219it [00:27,  5.83it/s]                         
     
 
 
@@ -8346,7 +8572,7 @@ shap.summary_plot(shap_values_weibull,
 
 
     
-![png](output_173_0.png)
+![png](output_175_0.png)
     
 
 
@@ -8379,7 +8605,7 @@ plt.show()
 
 
     
-![png](output_175_0.png)
+![png](output_177_0.png)
     
 
 
@@ -8442,7 +8668,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-31 13:01:43 UTC</td>
+      <td>2024-08-01 05:30:22 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8799,7 +9025,7 @@ plt.show()
 
 
     
-![png](output_177_0.png)
+![png](output_179_0.png)
     
 
 
@@ -8820,10 +9046,265 @@ display(f"Number of Significant Predictors: {cirrhosis_survival_aft_lognormal_si
 
 ```python
 ##################################
+# Formulating the Accelerated Failure Time model
+# based on a Log-Normal distribution
+# using the significant predictors only
+# and generating the summary
+##################################
+feature_subset = ['Bilirubin','Prothrombin','Age','Copper','Edema','N_Days','Status']
+cirrhosis_survival_aft_lognormal = LogNormalAFTFitter(penalizer=0.30)
+cirrhosis_survival_aft_lognormal.fit(cirrhosis_survival_train_modeling[feature_subset], duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_lognormal.print_summary()
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>model</th>
+      <td>lifelines.LogNormalAFTFitter</td>
+    </tr>
+    <tr>
+      <th>duration col</th>
+      <td>'N_Days'</td>
+    </tr>
+    <tr>
+      <th>event col</th>
+      <td>'Status'</td>
+    </tr>
+    <tr>
+      <th>penalizer</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>number of observations</th>
+      <td>218</td>
+    </tr>
+    <tr>
+      <th>number of events observed</th>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>log-likelihood</th>
+      <td>-779.28</td>
+    </tr>
+    <tr>
+      <th>time fit was run</th>
+      <td>2024-08-01 05:30:23 UTC</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;">coef</th>
+      <th style="min-width: 12px;">exp(coef)</th>
+      <th style="min-width: 12px;">se(coef)</th>
+      <th style="min-width: 12px;">coef lower 95%</th>
+      <th style="min-width: 12px;">coef upper 95%</th>
+      <th style="min-width: 12px;">exp(coef) lower 95%</th>
+      <th style="min-width: 12px;">exp(coef) upper 95%</th>
+      <th style="min-width: 12px;">cmp to</th>
+      <th style="min-width: 12px;">z</th>
+      <th style="min-width: 12px;">p</th>
+      <th style="min-width: 12px;">-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="6" valign="top">mu_</th>
+      <th>Age</th>
+      <td>-0.19</td>
+      <td>0.83</td>
+      <td>0.07</td>
+      <td>-0.32</td>
+      <td>-0.06</td>
+      <td>0.73</td>
+      <td>0.94</td>
+      <td>0.00</td>
+      <td>-2.90</td>
+      <td>&lt;0.005</td>
+      <td>8.05</td>
+    </tr>
+    <tr>
+      <th>Bilirubin</th>
+      <td>-0.37</td>
+      <td>0.69</td>
+      <td>0.07</td>
+      <td>-0.52</td>
+      <td>-0.23</td>
+      <td>0.60</td>
+      <td>0.79</td>
+      <td>0.00</td>
+      <td>-5.10</td>
+      <td>&lt;0.005</td>
+      <td>21.51</td>
+    </tr>
+    <tr>
+      <th>Copper</th>
+      <td>-0.22</td>
+      <td>0.80</td>
+      <td>0.07</td>
+      <td>-0.36</td>
+      <td>-0.08</td>
+      <td>0.70</td>
+      <td>0.93</td>
+      <td>0.00</td>
+      <td>-3.02</td>
+      <td>&lt;0.005</td>
+      <td>8.61</td>
+    </tr>
+    <tr>
+      <th>Edema</th>
+      <td>-0.56</td>
+      <td>0.57</td>
+      <td>0.17</td>
+      <td>-0.90</td>
+      <td>-0.21</td>
+      <td>0.41</td>
+      <td>0.81</td>
+      <td>0.00</td>
+      <td>-3.19</td>
+      <td>&lt;0.005</td>
+      <td>9.47</td>
+    </tr>
+    <tr>
+      <th>Prothrombin</th>
+      <td>-0.26</td>
+      <td>0.77</td>
+      <td>0.07</td>
+      <td>-0.40</td>
+      <td>-0.12</td>
+      <td>0.67</td>
+      <td>0.88</td>
+      <td>0.00</td>
+      <td>-3.73</td>
+      <td>&lt;0.005</td>
+      <td>12.35</td>
+    </tr>
+    <tr>
+      <th>Intercept</th>
+      <td>8.18</td>
+      <td>3566.84</td>
+      <td>0.09</td>
+      <td>8.00</td>
+      <td>8.36</td>
+      <td>2978.10</td>
+      <td>4271.97</td>
+      <td>0.00</td>
+      <td>88.87</td>
+      <td>&lt;0.005</td>
+      <td>inf</td>
+    </tr>
+    <tr>
+      <th>sigma_</th>
+      <th>Intercept</th>
+      <td>-0.11</td>
+      <td>0.90</td>
+      <td>0.07</td>
+      <td>-0.24</td>
+      <td>0.02</td>
+      <td>0.79</td>
+      <td>1.02</td>
+      <td>0.00</td>
+      <td>-1.66</td>
+      <td>0.10</td>
+      <td>3.38</td>
+    </tr>
+  </tbody>
+</table><br><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>Concordance</th>
+      <td>0.84</td>
+    </tr>
+    <tr>
+      <th>AIC</th>
+      <td>1572.55</td>
+    </tr>
+    <tr>
+      <th>log-likelihood ratio test</th>
+      <td>103.65 on 5 df</td>
+    </tr>
+    <tr>
+      <th>-log2(p) of ll-ratio test</th>
+      <td>66.59</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting the log accelerated failure rate of the
+# formulated Accelerated Failure Time model
+# using the significant predictors only
+# based on a Log-Normal distribution
+##################################
+cirrhosis_survival_aft_lognormal_summary = cirrhosis_survival_aft_lognormal.summary
+cirrhosis_survival_aft_lognormal_summary_params = pd.DataFrame(cirrhosis_survival_aft_lognormal.params_)
+significant = cirrhosis_survival_aft_lognormal_summary['p'] < 0.05
+cirrhosis_survival_aft_lognormal_summary_log_accelerated_failure_rate = (list(cirrhosis_survival_aft_lognormal_summary_params.iloc[:,0].values))
+plt.figure(figsize=(17, 8))
+colors = ['#993300' if sig else '#CC9966' for sig in significant]
+
+plt.barh([(index[0] + index[1]) for index in cirrhosis_survival_aft_lognormal_summary_params.index[0:5]], 
+         cirrhosis_survival_aft_lognormal_summary_log_accelerated_failure_rate[0:5], 
+         xerr=cirrhosis_survival_aft_lognormal_summary['se(coef)'][0:5], 
+         color=colors)
+plt.xlabel('Log(Accelerated Failure Rate)')
+plt.ylabel('Variables')
+plt.title('AFT_LOGNORMAL Log(Accelerated Failure Rate) Forest Plot')
+plt.axvline(x=0, color='k', linestyle='--')
+plt.gca().invert_yaxis()
+plt.show()
+```
+
+
+    
+![png](output_182_0.png)
+    
+
+
+
+```python
+##################################
 # Gathering the apparent model performance
 # as baseline for evaluating overfitting
 ##################################
-cirrhosis_survival_aft_lognormal.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_lognormal.fit(cirrhosis_survival_train_modeling[feature_subset], duration_col='N_Days', event_col='Status')
 train_predictions = cirrhosis_survival_aft_lognormal.predict_median(cirrhosis_survival_train_modeling)
 cirrhosis_survival_aft_lognormal_train_ci = concordance_index(cirrhosis_survival_train_modeling['N_Days'], 
                                                             train_predictions, 
@@ -8839,15 +9320,15 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_train_brier}")
 ```
 
 
-    'Apparent Concordance Index: 0.8528120936280884'
+    'Apparent Concordance Index: 0.8413524057217165'
 
 
 
-    'Apparent MAE: 2743.628741181377'
+    'Apparent MAE: 2518.3593852441504'
 
 
 
-    'Apparent Brier Score: 0.5644575168949746'
+    'Apparent Brier Score: 0.5470406779352225'
 
 
 
@@ -8865,7 +9346,7 @@ for train_index, val_index in kf.split(cirrhosis_survival_train_modeling):
     df_train_fold = cirrhosis_survival_train_modeling.iloc[train_index]
     df_val_fold = cirrhosis_survival_train_modeling.iloc[val_index]
     
-    cirrhosis_survival_aft_lognormal.fit(df_train_fold, duration_col='N_Days', event_col='Status')
+    cirrhosis_survival_aft_lognormal.fit(df_train_fold[feature_subset], duration_col='N_Days', event_col='Status')
     val_predictions = cirrhosis_survival_aft_lognormal.predict_median(df_val_fold)
     time_point = df_val_fold['N_Days'].median()
     ci = concordance_index(df_val_fold['N_Days'], val_predictions, df_val_fold['Status'])
@@ -8888,15 +9369,15 @@ display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_lognormal_cv_brie
 ```
 
 
-    'Cross-Validated Concordance Index: 0.8132411500056491'
+    'Cross-Validated Concordance Index: 0.8255764006037584'
 
 
 
-    'Cross-Validated MAE: 2798.348656958315'
+    'Cross-Validated MAE: 2502.6369548831367'
 
 
 
-    'Cross-Validated Brier Score: 0.555337384006344'
+    'Cross-Validated Brier Score: 0.5425832599120203'
 
 
 
@@ -8920,15 +9401,15 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_test_brier}")
 ```
 
 
-    'Apparent Concordance Index: 0.8775510204081632'
+    'Apparent Concordance Index: 0.8752834467120182'
 
 
 
-    'Apparent MAE: 2017.4183597977756'
+    'Apparent MAE: 1904.9879866903511'
 
 
 
-    'Apparent Brier Score: 0.5996287786549918'
+    'Apparent Brier Score: 0.5775019785104171'
 
 
 
@@ -8937,9 +9418,9 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_test_brier}")
 # Gathering the model performance metrics
 # from training, cross-validation and test
 ##################################
-coxph_aft_lognormal_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
-coxph_aft_lognormal_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
-coxph_aft_lognormal_metric_values = pd.DataFrame([cirrhosis_survival_aft_lognormal_train_ci,
+aft_lognormal_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
+aft_lognormal_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
+aft_lognormal_metric_values = pd.DataFrame([cirrhosis_survival_aft_lognormal_train_ci,
                                            cirrhosis_survival_aft_lognormal_cv_ci_mean,
                                            cirrhosis_survival_aft_lognormal_test_ci,
                                            cirrhosis_survival_aft_lognormal_train_mae,
@@ -8948,15 +9429,15 @@ coxph_aft_lognormal_metric_values = pd.DataFrame([cirrhosis_survival_aft_lognorm
                                            cirrhosis_survival_aft_lognormal_train_brier,
                                            cirrhosis_survival_aft_lognormal_cv_brier_mean,
                                            cirrhosis_survival_aft_lognormal_test_brier])
-coxph_aft_lognormal_method = pd.DataFrame(["AFT_LOGNORMAL"]*9)
-coxph_aft_lognormal_summary = pd.concat([coxph_aft_lognormal_set,
-                                       coxph_aft_lognormal_metric,
-                                       coxph_aft_lognormal_metric_values,
-                                       coxph_aft_lognormal_method], 
+aft_lognormal_method = pd.DataFrame(["AFT_LOGNORMAL"]*9)
+aft_lognormal_summary = pd.concat([aft_lognormal_set,
+                                       aft_lognormal_metric,
+                                       aft_lognormal_metric_values,
+                                       aft_lognormal_method], 
                                       axis=1)
-coxph_aft_lognormal_summary.columns = ['Set', 'Metric', 'Value', 'Method']
-coxph_aft_lognormal_summary.reset_index(inplace=True, drop=True)
-display(coxph_aft_lognormal_summary)
+aft_lognormal_summary.columns = ['Set', 'Metric', 'Value', 'Method']
+aft_lognormal_summary.reset_index(inplace=True, drop=True)
+display(aft_lognormal_summary)
 
 ```
 
@@ -8990,63 +9471,63 @@ display(coxph_aft_lognormal_summary)
       <th>0</th>
       <td>Train</td>
       <td>Concordance.Index</td>
-      <td>0.852812</td>
+      <td>0.841352</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Cross-Validation</td>
       <td>Concordance.Index</td>
-      <td>0.813241</td>
+      <td>0.825576</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Test</td>
       <td>Concordance.Index</td>
-      <td>0.877551</td>
+      <td>0.875283</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Train</td>
       <td>MAE</td>
-      <td>2743.628741</td>
+      <td>2518.359385</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Cross-Validation</td>
       <td>MAE</td>
-      <td>2798.348657</td>
+      <td>2502.636955</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>5</th>
       <td>Test</td>
       <td>MAE</td>
-      <td>2017.418360</td>
+      <td>1904.987987</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>6</th>
       <td>Train</td>
       <td>Brier.Score</td>
-      <td>0.564458</td>
+      <td>0.547041</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>7</th>
       <td>Cross-Validation</td>
       <td>Brier.Score</td>
-      <td>0.555337</td>
+      <td>0.542583</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
     <tr>
       <th>8</th>
       <td>Test</td>
       <td>Brier.Score</td>
-      <td>0.599629</td>
+      <td>0.577502</td>
       <td>AFT_LOGNORMAL</td>
     </tr>
   </tbody>
@@ -9077,7 +9558,7 @@ plt.show()
 
 
     
-![png](output_183_0.png)
+![png](output_187_0.png)
     
 
 
@@ -9104,7 +9585,7 @@ plt.show()
 
 
     
-![png](output_184_0.png)
+![png](output_188_0.png)
     
 
 
@@ -9127,7 +9608,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:21,  6.05it/s]                         
+    PermutationExplainer explainer: 219it [00:24,  5.22it/s]                         
     
 
 
@@ -9141,7 +9622,7 @@ shap.summary_plot(shap_values_lognormal,
 
 
     
-![png](output_186_0.png)
+![png](output_190_0.png)
     
 
 
@@ -9174,7 +9655,7 @@ plt.show()
 
 
     
-![png](output_188_0.png)
+![png](output_192_0.png)
     
 
 
@@ -9237,7 +9718,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-07-31 13:02:09 UTC</td>
+      <td>2024-08-01 05:30:54 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9590,12 +10071,11 @@ plt.title('AFT_LOGLOGISTIC Log(Accelerated Failure Rate) Forest Plot')
 plt.axvline(x=0, color='k', linestyle='--')
 plt.gca().invert_yaxis()
 plt.show()
-
 ```
 
 
     
-![png](output_190_0.png)
+![png](output_194_0.png)
     
 
 
@@ -9616,10 +10096,251 @@ display(f"Number of Significant Predictors: {cirrhosis_survival_aft_loglogistic_
 
 ```python
 ##################################
+# Formulating the Accelerated Failure Time model
+# based on a Log-Logistic distribution
+# using the significant predictors only
+# and generating the summary
+##################################
+feature_subset = ['Bilirubin','Prothrombin','Age','Copper','N_Days','Status']
+cirrhosis_survival_aft_loglogistic = LogLogisticAFTFitter(penalizer=0.30)
+cirrhosis_survival_aft_loglogistic.fit(cirrhosis_survival_train_modeling[feature_subset], duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_loglogistic.print_summary()
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>model</th>
+      <td>lifelines.LogLogisticAFTFitter</td>
+    </tr>
+    <tr>
+      <th>duration col</th>
+      <td>'N_Days'</td>
+    </tr>
+    <tr>
+      <th>event col</th>
+      <td>'Status'</td>
+    </tr>
+    <tr>
+      <th>penalizer</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>number of observations</th>
+      <td>218</td>
+    </tr>
+    <tr>
+      <th>number of events observed</th>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>log-likelihood</th>
+      <td>-792.48</td>
+    </tr>
+    <tr>
+      <th>time fit was run</th>
+      <td>2024-08-01 05:30:55 UTC</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;"></th>
+      <th style="min-width: 12px;">coef</th>
+      <th style="min-width: 12px;">exp(coef)</th>
+      <th style="min-width: 12px;">se(coef)</th>
+      <th style="min-width: 12px;">coef lower 95%</th>
+      <th style="min-width: 12px;">coef upper 95%</th>
+      <th style="min-width: 12px;">exp(coef) lower 95%</th>
+      <th style="min-width: 12px;">exp(coef) upper 95%</th>
+      <th style="min-width: 12px;">cmp to</th>
+      <th style="min-width: 12px;">z</th>
+      <th style="min-width: 12px;">p</th>
+      <th style="min-width: 12px;">-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">alpha_</th>
+      <th>Age</th>
+      <td>-0.20</td>
+      <td>0.82</td>
+      <td>0.07</td>
+      <td>-0.35</td>
+      <td>-0.06</td>
+      <td>0.71</td>
+      <td>0.94</td>
+      <td>0.00</td>
+      <td>-2.80</td>
+      <td>0.01</td>
+      <td>7.60</td>
+    </tr>
+    <tr>
+      <th>Bilirubin</th>
+      <td>-0.40</td>
+      <td>0.67</td>
+      <td>0.08</td>
+      <td>-0.56</td>
+      <td>-0.25</td>
+      <td>0.57</td>
+      <td>0.78</td>
+      <td>0.00</td>
+      <td>-5.13</td>
+      <td>&lt;0.005</td>
+      <td>21.73</td>
+    </tr>
+    <tr>
+      <th>Copper</th>
+      <td>-0.22</td>
+      <td>0.80</td>
+      <td>0.08</td>
+      <td>-0.38</td>
+      <td>-0.07</td>
+      <td>0.69</td>
+      <td>0.93</td>
+      <td>0.00</td>
+      <td>-2.84</td>
+      <td>&lt;0.005</td>
+      <td>7.80</td>
+    </tr>
+    <tr>
+      <th>Prothrombin</th>
+      <td>-0.29</td>
+      <td>0.75</td>
+      <td>0.08</td>
+      <td>-0.44</td>
+      <td>-0.14</td>
+      <td>0.65</td>
+      <td>0.87</td>
+      <td>0.00</td>
+      <td>-3.84</td>
+      <td>&lt;0.005</td>
+      <td>13.00</td>
+    </tr>
+    <tr>
+      <th>Intercept</th>
+      <td>8.17</td>
+      <td>3530.45</td>
+      <td>0.10</td>
+      <td>7.98</td>
+      <td>8.36</td>
+      <td>2909.02</td>
+      <td>4284.63</td>
+      <td>0.00</td>
+      <td>82.70</td>
+      <td>&lt;0.005</td>
+      <td>inf</td>
+    </tr>
+    <tr>
+      <th>beta_</th>
+      <th>Intercept</th>
+      <td>0.48</td>
+      <td>1.61</td>
+      <td>0.08</td>
+      <td>0.32</td>
+      <td>0.63</td>
+      <td>1.38</td>
+      <td>1.87</td>
+      <td>0.00</td>
+      <td>6.08</td>
+      <td>&lt;0.005</td>
+      <td>29.59</td>
+    </tr>
+  </tbody>
+</table><br><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>Concordance</th>
+      <td>0.84</td>
+    </tr>
+    <tr>
+      <th>AIC</th>
+      <td>1596.96</td>
+    </tr>
+    <tr>
+      <th>log-likelihood ratio test</th>
+      <td>73.33 on 4 df</td>
+    </tr>
+    <tr>
+      <th>-log2(p) of ll-ratio test</th>
+      <td>47.66</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting the log accelerated failure rate of the
+# formulated Accelerated Failure Time model
+# using the significant predictors only
+# based on a Log-Logistic distribution
+##################################
+cirrhosis_survival_aft_loglogistic_summary = cirrhosis_survival_aft_loglogistic.summary
+cirrhosis_survival_aft_loglogistic_summary_params = pd.DataFrame(cirrhosis_survival_aft_loglogistic.params_)
+significant = cirrhosis_survival_aft_loglogistic_summary['p'] < 0.05
+cirrhosis_survival_aft_loglogistic_summary_log_accelerated_failure_rate = (list(cirrhosis_survival_aft_loglogistic_summary_params.iloc[:,0].values))
+plt.figure(figsize=(17, 8))
+colors = ['#993300' if sig else '#CC9966' for sig in significant]
+
+plt.barh([(index[0] + index[1]) for index in cirrhosis_survival_aft_loglogistic_summary_params.index[0:4]], 
+         cirrhosis_survival_aft_loglogistic_summary_log_accelerated_failure_rate[0:4], 
+         xerr=cirrhosis_survival_aft_loglogistic_summary['se(coef)'][0:4], 
+         color=colors)
+plt.xlabel('Log(Accelerated Failure Rate)')
+plt.ylabel('Variables')
+plt.title('AFT_LOGLOGISTIC Log(Accelerated Failure Rate) Forest Plot')
+plt.axvline(x=0, color='k', linestyle='--')
+plt.gca().invert_yaxis()
+plt.show()
+```
+
+
+    
+![png](output_197_0.png)
+    
+
+
+
+```python
+##################################
 # Gathering the apparent model performance
 # as baseline for evaluating overfitting
 ##################################
-cirrhosis_survival_aft_loglogistic.fit(cirrhosis_survival_train_modeling, duration_col='N_Days', event_col='Status')
+cirrhosis_survival_aft_loglogistic.fit(cirrhosis_survival_train_modeling[feature_subset], duration_col='N_Days', event_col='Status')
 train_predictions = cirrhosis_survival_aft_loglogistic.predict_median(cirrhosis_survival_train_modeling)
 cirrhosis_survival_aft_loglogistic_train_ci = concordance_index(cirrhosis_survival_train_modeling['N_Days'], 
                                                             train_predictions, 
@@ -9635,15 +10356,15 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_train_brier}
 ```
 
 
-    'Apparent Concordance Index: 0.8551690507152145'
+    'Apparent Concordance Index: 0.8383452535760728'
 
 
 
-    'Apparent MAE: 3219.26580614041'
+    'Apparent MAE: 2727.465086218323'
 
 
 
-    'Apparent Brier Score: 0.5434035341542703'
+    'Apparent Brier Score: 0.5095276225408752'
 
 
 
@@ -9661,7 +10382,7 @@ for train_index, val_index in kf.split(cirrhosis_survival_train_modeling):
     df_train_fold = cirrhosis_survival_train_modeling.iloc[train_index]
     df_val_fold = cirrhosis_survival_train_modeling.iloc[val_index]
     
-    cirrhosis_survival_aft_loglogistic.fit(df_train_fold, duration_col='N_Days', event_col='Status')
+    cirrhosis_survival_aft_loglogistic.fit(df_train_fold[feature_subset], duration_col='N_Days', event_col='Status')
     val_predictions = cirrhosis_survival_aft_loglogistic.predict_median(df_val_fold)
     time_point = df_val_fold['N_Days'].median()
     ci = concordance_index(df_val_fold['N_Days'], val_predictions, df_val_fold['Status'])
@@ -9684,15 +10405,15 @@ display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_loglogistic_cv_br
 ```
 
 
-    'Cross-Validated Concordance Index: 0.8199806213584104'
+    'Cross-Validated Concordance Index: 0.8301281045334907'
 
 
 
-    'Cross-Validated MAE: 3286.319389449709'
+    'Cross-Validated MAE: 2711.660486031347'
 
 
 
-    'Cross-Validated Brier Score: 0.535382409664783'
+    'Cross-Validated Brier Score: 0.5065381245204558'
 
 
 
@@ -9716,15 +10437,15 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_test_brier}"
 ```
 
 
-    'Apparent Concordance Index: 0.8802721088435375'
+    'Apparent Concordance Index: 0.8625850340136054'
 
 
 
-    'Apparent MAE: 2388.7013564558247'
+    'Apparent MAE: 2189.9323142397434'
 
 
 
-    'Apparent Brier Score: 0.5712439252494961'
+    'Apparent Brier Score: 0.5332955064077312'
 
 
 
@@ -9733,9 +10454,9 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_test_brier}"
 # Gathering the model performance metrics
 # from training, cross-validation and test
 ##################################
-coxph_aft_loglogistic_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
-coxph_aft_loglogistic_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
-coxph_aft_loglogistic_metric_values = pd.DataFrame([cirrhosis_survival_aft_loglogistic_train_ci,
+aft_loglogistic_set = pd.DataFrame(["Train","Cross-Validation","Test"]*3)
+aft_loglogistic_metric = pd.DataFrame((["Concordance.Index"]*3) + (["MAE"]*3) + (["Brier.Score"]*3))
+aft_loglogistic_metric_values = pd.DataFrame([cirrhosis_survival_aft_loglogistic_train_ci,
                                            cirrhosis_survival_aft_loglogistic_cv_ci_mean,
                                            cirrhosis_survival_aft_loglogistic_test_ci,
                                            cirrhosis_survival_aft_loglogistic_train_mae,
@@ -9744,15 +10465,15 @@ coxph_aft_loglogistic_metric_values = pd.DataFrame([cirrhosis_survival_aft_loglo
                                            cirrhosis_survival_aft_loglogistic_train_brier,
                                            cirrhosis_survival_aft_loglogistic_cv_brier_mean,
                                            cirrhosis_survival_aft_loglogistic_test_brier])
-coxph_aft_loglogistic_method = pd.DataFrame(["AFT_LOGLOGISTIC"]*9)
-coxph_aft_loglogistic_summary = pd.concat([coxph_aft_loglogistic_set,
-                                       coxph_aft_loglogistic_metric,
-                                       coxph_aft_loglogistic_metric_values,
-                                       coxph_aft_loglogistic_method], 
+aft_loglogistic_method = pd.DataFrame(["AFT_LOGLOGISTIC"]*9)
+aft_loglogistic_summary = pd.concat([aft_loglogistic_set,
+                                       aft_loglogistic_metric,
+                                       aft_loglogistic_metric_values,
+                                       aft_loglogistic_method], 
                                       axis=1)
-coxph_aft_loglogistic_summary.columns = ['Set', 'Metric', 'Value', 'Method']
-coxph_aft_loglogistic_summary.reset_index(inplace=True, drop=True)
-display(coxph_aft_loglogistic_summary)
+aft_loglogistic_summary.columns = ['Set', 'Metric', 'Value', 'Method']
+aft_loglogistic_summary.reset_index(inplace=True, drop=True)
+display(aft_loglogistic_summary)
 ```
 
 
@@ -9785,63 +10506,63 @@ display(coxph_aft_loglogistic_summary)
       <th>0</th>
       <td>Train</td>
       <td>Concordance.Index</td>
-      <td>0.855169</td>
+      <td>0.838345</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Cross-Validation</td>
       <td>Concordance.Index</td>
-      <td>0.819981</td>
+      <td>0.830128</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Test</td>
       <td>Concordance.Index</td>
-      <td>0.880272</td>
+      <td>0.862585</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Train</td>
       <td>MAE</td>
-      <td>3219.265806</td>
+      <td>2727.465086</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Cross-Validation</td>
       <td>MAE</td>
-      <td>3286.319389</td>
+      <td>2711.660486</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>5</th>
       <td>Test</td>
       <td>MAE</td>
-      <td>2388.701356</td>
+      <td>2189.932314</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>6</th>
       <td>Train</td>
       <td>Brier.Score</td>
-      <td>0.543404</td>
+      <td>0.509528</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>7</th>
       <td>Cross-Validation</td>
       <td>Brier.Score</td>
-      <td>0.535382</td>
+      <td>0.506538</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
     <tr>
       <th>8</th>
       <td>Test</td>
       <td>Brier.Score</td>
-      <td>0.571244</td>
+      <td>0.533296</td>
       <td>AFT_LOGLOGISTIC</td>
     </tr>
   </tbody>
@@ -9872,7 +10593,7 @@ plt.show()
 
 
     
-![png](output_196_0.png)
+![png](output_202_0.png)
     
 
 
@@ -9899,7 +10620,7 @@ plt.show()
 
 
     
-![png](output_197_0.png)
+![png](output_203_0.png)
     
 
 
@@ -9921,7 +10642,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:17,  5.20it/s]                         
+    PermutationExplainer explainer: 219it [00:24,  5.39it/s]                         
     
 
 
@@ -9935,12 +10656,359 @@ shap.summary_plot(shap_values_loglogistic,
 
 
     
-![png](output_199_0.png)
+![png](output_205_0.png)
     
 
 
 ## 1.7. Consolidated Findings <a class="anchor" id="1.7"></a>
 
+
+
+
+```python
+##################################
+# Consolidating all the
+# model performance metrics
+##################################
+model_performance_comparison = pd.concat([aft_weibull_summary, 
+                                          aft_lognormal_summary,
+                                          aft_loglogistic_summary], 
+                                         axis=0,
+                                         ignore_index=True)
+print('Accelerated Failure Time Model Comparison: ')
+display(model_performance_comparison)
+```
+
+    Accelerated Failure Time Model Comparison: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Set</th>
+      <th>Metric</th>
+      <th>Value</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Train</td>
+      <td>Concordance.Index</td>
+      <td>0.829080</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Cross-Validation</td>
+      <td>Concordance.Index</td>
+      <td>0.825008</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Test</td>
+      <td>Concordance.Index</td>
+      <td>0.852608</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Train</td>
+      <td>MAE</td>
+      <td>2280.743783</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Cross-Validation</td>
+      <td>MAE</td>
+      <td>2303.605628</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Test</td>
+      <td>MAE</td>
+      <td>1948.873380</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Train</td>
+      <td>Brier.Score</td>
+      <td>0.515148</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Cross-Validation</td>
+      <td>Brier.Score</td>
+      <td>0.512583</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Test</td>
+      <td>Brier.Score</td>
+      <td>0.537556</td>
+      <td>AFT_WEIBULL</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Train</td>
+      <td>Concordance.Index</td>
+      <td>0.841352</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Cross-Validation</td>
+      <td>Concordance.Index</td>
+      <td>0.825576</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Test</td>
+      <td>Concordance.Index</td>
+      <td>0.875283</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Train</td>
+      <td>MAE</td>
+      <td>2518.359385</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Cross-Validation</td>
+      <td>MAE</td>
+      <td>2502.636955</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Test</td>
+      <td>MAE</td>
+      <td>1904.987987</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Train</td>
+      <td>Brier.Score</td>
+      <td>0.547041</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Cross-Validation</td>
+      <td>Brier.Score</td>
+      <td>0.542583</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Test</td>
+      <td>Brier.Score</td>
+      <td>0.577502</td>
+      <td>AFT_LOGNORMAL</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Train</td>
+      <td>Concordance.Index</td>
+      <td>0.838345</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Cross-Validation</td>
+      <td>Concordance.Index</td>
+      <td>0.830128</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Test</td>
+      <td>Concordance.Index</td>
+      <td>0.862585</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Train</td>
+      <td>MAE</td>
+      <td>2727.465086</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Cross-Validation</td>
+      <td>MAE</td>
+      <td>2711.660486</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>Test</td>
+      <td>MAE</td>
+      <td>2189.932314</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>Train</td>
+      <td>Brier.Score</td>
+      <td>0.509528</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Cross-Validation</td>
+      <td>Brier.Score</td>
+      <td>0.506538</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Test</td>
+      <td>Brier.Score</td>
+      <td>0.533296</td>
+      <td>AFT_LOGLOGISTIC</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating the concordance indices
+# for all sets and models
+##################################
+set_labels = ['Train','Cross-Validation','Test']
+aft_weibull_ci = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='Concordance.Index') &
+                                              (model_performance_comparison['Method']=='AFT_WEIBULL')]['Value'].values
+aft_lognormal_ci = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='Concordance.Index') &
+                                              (model_performance_comparison['Method']=='AFT_LOGNORMAL')]['Value'].values
+aft_loglogistic_ci = model_performance_comparison[((model_performance_comparison['Set'] == 'Train') |
+                                               (model_performance_comparison['Set'] == 'Cross-Validation') |
+                                               (model_performance_comparison['Set'] == 'Test')) & 
+                                              (model_performance_comparison['Metric']=='Concordance.Index') &
+                                              (model_performance_comparison['Method']=='AFT_LOGLOGISTIC')]['Value'].values
+```
+
+
+```python
+##################################
+# Plotting the values for the
+# concordance indices
+# for all models
+##################################
+ci_plot = pd.DataFrame({'AFT_WEIBULL': list(aft_weibull_ci),
+                        'AFT_LOGNORMAL': list(aft_lognormal_ci),
+                        'AFT_LOGLOGISTIC': list(aft_loglogistic_ci)},
+                       index = set_labels)
+display(ci_plot)
+```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>AFT_WEIBULL</th>
+      <th>AFT_LOGNORMAL</th>
+      <th>AFT_LOGLOGISTIC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Train</th>
+      <td>0.829080</td>
+      <td>0.841352</td>
+      <td>0.838345</td>
+    </tr>
+    <tr>
+      <th>Cross-Validation</th>
+      <td>0.825008</td>
+      <td>0.825576</td>
+      <td>0.830128</td>
+    </tr>
+    <tr>
+      <th>Test</th>
+      <td>0.852608</td>
+      <td>0.875283</td>
+      <td>0.862585</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Plotting all the concordance indices
+# for all models
+##################################
+ci_plot = ci_plot.plot.barh(figsize=(10, 6), width=0.90)
+ci_plot.set_xlim(0.00,1.00)
+ci_plot.set_title("Model Comparison by Concordance Indices")
+ci_plot.set_xlabel("Concordance Index")
+ci_plot.set_ylabel("Data Set")
+ci_plot.grid(False)
+ci_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in ci_plot.containers:
+    ci_plot.bar_label(container, fmt='%.5f', padding=-50, color='white', fontweight='bold')
+```
+
+
+    
+![png](output_210_0.png)
+    
 
 
 # 2. Summary <a class="anchor" id="Summary"></a>
