@@ -7567,6 +7567,45 @@ cirrhosis_survival_test_modeling.head()
 
 [Weibull Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival time errors follow a Weibull distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a Weibull-distributed error term. This model is flexible as it can model both increasing and decreasing hazard rates over time and can be used to model various types of survival data. However, the results may be complex to interpret if the shape parameter does not align well with the data, and the model can also be sensitive to the distributional assumptions.
 
+[Weibull Accelerated Failure Time Models](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival time errors follow a Weibull distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a Weibull-distributed error term. This model is flexible as it can model both increasing and decreasing hazard rates over time and can be used to model various types of survival data. However, the results may be complex to interpret if the shape parameter does not align well with the data, and the model can also be sensitive to the distributional assumptions.
+
+[Concordance Index](https://lifelines.readthedocs.io/en/latest/lifelines.utils.html) measures the model's ability to correctly order pairs of observations based on their predicted survival times. Values range from 0.5 to 1.0 indicating no predictive power (random guessing) and perfect predictions, respectively. As a metric, it provides a measure of discriminative ability and useful for ranking predictions. However, it does not provide information on the magnitude of errors and may be insensitive to the calibration of predicted survival probabilities.
+
+[Mean Absolute Error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html) measures the average magnitude of the errors between predicted and actual survival times. Lower MAE values indicate better model performance, while reflecting the average prediction error in the same units as the survival time. As a metric, it is intuitive and easy to interpret while providing a direct measure of prediction accuracy. However, it may be sensitive to outliers and does not consider the probabilistic nature of survival predictions.
+
+[Brier Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html) measures the accuracy of probabilistic predictions of survival at a specific time point. Values range from 0 to 1 with a lower brier scores indicating better accuracy. A Brier score of 0 indicates perfect predictions, while a score of 1 indicates the worst possible predictions. As a metric, it considers both discrimination and calibration, while reflecting the accuracy of predicted survival probabilities. However, it requires specifying a time point and aggregating scores over time points may be less interpretable.
+
+1. The [weibull accelerated failure time model](https://lifelines.readthedocs.io/en/latest/fitters/regression/WeibullAFTFitter.html) from the <mark style="background-color: #CCECFF"><b>lifelines.WeibullAFTFitter</b></mark> Python library API was implemented. 
+2. The model implementation used 1 hyperparameter:
+    * <span style="color: #FF0000">penalizer</span> = penalty to the size of the coefficients during regression fixed at a value = 0.30
+3. Only 3 of the 17 predictors, which were determined by the model as statistically significant, were used for prediction:
+    * <span style="color: #FF0000">Bilirubin</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Prothrombin</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Age</span>: Increase in value associated with a decrease in time to event 
+4. The cross-validated model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8250
+    * **Mean Absolute Error** = 2303.6056
+    * **Brier Score** = 0.5125
+5. The apparent model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8291
+    * **Mean Absolute Error** = 2280.7437
+    * **Brier Score** = 0.5151
+6. The independent test model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8526
+    * **Mean Absolute Error** = 1948.8733
+    * **Brier Score** = 0.5375
+7. Comparable apparent and cross-validated model performance was observed, indicative of the presence of minimal model overfitting.
+8. The MAE for event observations were typically lower because the errors were directly tied to the observed event times, which are known and can be more accurately predicted. For censored observations, the prediction error reflects the model's inability to pinpoint the exact event time, leading to higher MAE due to the larger variability and the longer tail of potential event times beyond the censoring point.
+9. Survival probability curves estimated for all cases. Shorter median survival times were observed for:
+    * Event cases as compared to censored cases
+    * Higher values for <span style="color: #FF0000">Bilirubin</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Prothrombin</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Age</span> as compared to lower values
+10. SHAP values were computed for the significant predictors, with contributions to the model output ranked as follows:
+    * Higher values for <span style="color: #FF0000">Bilirubin</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Prothrombin</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Age</span> result to the event expected to occur sooner
+
 
 ```python
 ##################################
@@ -7648,7 +7687,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 07:10:10 UTC</td>
+      <td>2024-08-02 01:13:51 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8084,7 +8123,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 07:10:11 UTC</td>
+      <td>2024-08-02 01:13:51 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8648,7 +8687,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:55,  3.56it/s]                         
+    PermutationExplainer explainer: 219it [00:14,  5.03it/s]                         
     
 
 
@@ -8676,6 +8715,48 @@ shap.summary_plot(shap_values_weibull,
 
 [Log-Normal Accelerated Failure Time Model](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the logarithm of survival time errors follows a normal distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a standard normal error term. This model can be a good fit for data with a log-normal distribution, with well-established statistical properties and straightforward interpretation on the log scale. However, the model can have limited flexibility in hazard rate shapes compared to the Weibull model and can be less intuitive to interpret on the original time scale.
 
+[Concordance Index](https://lifelines.readthedocs.io/en/latest/lifelines.utils.html) measures the model's ability to correctly order pairs of observations based on their predicted survival times. Values range from 0.5 to 1.0 indicating no predictive power (random guessing) and perfect predictions, respectively. As a metric, it provides a measure of discriminative ability and useful for ranking predictions. However, it does not provide information on the magnitude of errors and may be insensitive to the calibration of predicted survival probabilities.
+
+[Mean Absolute Error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html) measures the average magnitude of the errors between predicted and actual survival times. Lower MAE values indicate better model performance, while reflecting the average prediction error in the same units as the survival time. As a metric, it is intuitive and easy to interpret while providing a direct measure of prediction accuracy. However, it may be sensitive to outliers and does not consider the probabilistic nature of survival predictions.
+
+[Brier Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html) measures the accuracy of probabilistic predictions of survival at a specific time point. Values range from 0 to 1 with a lower brier scores indicating better accuracy. A Brier score of 0 indicates perfect predictions, while a score of 1 indicates the worst possible predictions. As a metric, it considers both discrimination and calibration, while reflecting the accuracy of predicted survival probabilities. However, it requires specifying a time point and aggregating scores over time points may be less interpretable.
+
+1. The [log-normal accelerated failure time model](https://lifelines.readthedocs.io/en/latest/fitters/regression/LogNormalAFTFitter.html) from the <mark style="background-color: #CCECFF"><b>lifelines.LogNormalAFTFitter</b></mark> Python library API was implemented. 
+2. The model implementation used 1 hyperparameter:
+    * <span style="color: #FF0000">penalizer</span> = penalty to the size of the coefficients during regression fixed at a value = 0.30
+3. Only 5 of the 17 predictors, which were determined by the model as statistically significant, were used for prediction:
+    * <span style="color: #FF0000">Edema</span>: Presence associated with a decrease in time to event 
+    * <span style="color: #FF0000">Bilirubin</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Age</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Prothrombin</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Copper</span>: Increase in value associated with a decrease in time to event 
+4. The cross-validated model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8255
+    * **Mean Absolute Error** = 2502.6369
+    * **Brier Score** = 0.5425
+5. The apparent model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8413
+    * **Mean Absolute Error** = 2518.3594
+    * **Brier Score** = 0.5470
+6. The independent test model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8753
+    * **Mean Absolute Error** = 1904.9879
+    * **Brier Score** = 0.5775
+7. Comparable apparent and cross-validated model performance was observed, indicative of the presence of minimal model overfitting.
+8. The MAE for event observations were typically lower because the errors were directly tied to the observed event times, which are known and can be more accurately predicted. For censored observations, the prediction error reflects the model's inability to pinpoint the exact event time, leading to higher MAE due to the larger variability and the longer tail of potential event times beyond the censoring point.
+9. Survival probability curves estimated for all cases. Shorter median survival times were observed for:
+    * Event cases as compared to censored cases
+    * Presence of <span style="color: #FF0000">Edema</span> as compared to absence
+    * Higher values for <span style="color: #FF0000">Bilirubin</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Age</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Prothrombin</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Copper</span> as compared to lower values
+10. SHAP values were computed for the significant predictors, with contributions to the model output ranked as follows:
+    * Higher values for <span style="color: #FF0000">Bilirubin</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Prothrombin</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Copper</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Age</span> result to the event expected to occur sooner
+    * Presence of <span style="color: #FF0000">Edema</span> results to the event expected to occur sooner
 
 
 ```python
@@ -8758,7 +8839,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 07:11:24 UTC</td>
+      <td>2024-08-02 01:14:09 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9194,7 +9275,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 07:11:25 UTC</td>
+      <td>2024-08-02 01:14:10 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9846,7 +9927,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:47,  3.57it/s]                         
+    PermutationExplainer explainer: 219it [00:12,  3.81it/s]                         
     
 
 
@@ -9874,6 +9955,45 @@ shap.summary_plot(shap_values_lognormal,
 
 [Log-Logistic Accelerated Failure Time Model](https://link.springer.com/book/10.1007/978-1-4419-6646-9/) assumes that the survival time errors follow a log-logistic distribution. The mathematical equation is represented by the logarithm of the survival time being equal to the sum of the vector of covariates multiplied to the vector of regression coefficients; and the product of the scale parameter and a standard logistic error term. This model can estimate various hazard shapes, including non-monotonic hazard functions and may be more flexible than the Log Normal model. However, interpretation of results can be complex due to the nature of the logistic distribution and the model structure may be less robust to outliers compared to other models.
 
+[Concordance Index](https://lifelines.readthedocs.io/en/latest/lifelines.utils.html) measures the model's ability to correctly order pairs of observations based on their predicted survival times. Values range from 0.5 to 1.0 indicating no predictive power (random guessing) and perfect predictions, respectively. As a metric, it provides a measure of discriminative ability and useful for ranking predictions. However, it does not provide information on the magnitude of errors and may be insensitive to the calibration of predicted survival probabilities.
+
+[Mean Absolute Error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html) measures the average magnitude of the errors between predicted and actual survival times. Lower MAE values indicate better model performance, while reflecting the average prediction error in the same units as the survival time. As a metric, it is intuitive and easy to interpret while providing a direct measure of prediction accuracy. However, it may be sensitive to outliers and does not consider the probabilistic nature of survival predictions.
+
+[Brier Score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html) measures the accuracy of probabilistic predictions of survival at a specific time point. Values range from 0 to 1 with a lower brier scores indicating better accuracy. A Brier score of 0 indicates perfect predictions, while a score of 1 indicates the worst possible predictions. As a metric, it considers both discrimination and calibration, while reflecting the accuracy of predicted survival probabilities. However, it requires specifying a time point and aggregating scores over time points may be less interpretable.
+
+1. The [log-logistic accelerated failure time model](https://lifelines.readthedocs.io/en/latest/fitters/regression/LogLogisticAFTFitter.html) from the <mark style="background-color: #CCECFF"><b>lifelines.LogLogisticAFTFitter</b></mark> Python library API was implemented. 
+2. The model implementation used 1 hyperparameter:
+    * <span style="color: #FF0000">penalizer</span> = penalty to the size of the coefficients during regression fixed at a value = 0.30
+3. Only 5 of the 17 predictors, which were determined by the model as statistically significant, were used for prediction:
+    * <span style="color: #FF0000">Bilirubin</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Prothrombin</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Age</span>: Increase in value associated with a decrease in time to event 
+    * <span style="color: #FF0000">Copper</span>: Increase in value associated with a decrease in time to event 
+4. The cross-validated model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8301
+    * **Mean Absolute Error** = 2711.6604
+    * **Brier Score** = 0.5065
+5. The apparent model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8383
+    * **Mean Absolute Error** = 2727.4651
+    * **Brier Score** = 0.5095
+6. The independent test model performance of the model is summarized as follows:
+    * **Concordance Index** = 0.8625
+    * **Mean Absolute Error** = 2189.9323
+    * **Brier Score** = 0.5332
+7. Comparable apparent and cross-validated model performance was observed, indicative of the presence of minimal model overfitting.
+8. The MAE for event observations were typically lower because the errors were directly tied to the observed event times, which are known and can be more accurately predicted. For censored observations, the prediction error reflects the model's inability to pinpoint the exact event time, leading to higher MAE due to the larger variability and the longer tail of potential event times beyond the censoring point.
+9. Survival probability curves estimated for all cases. Shorter median survival times were observed for:
+    * Event cases as compared to censored cases
+    * Higher values for <span style="color: #FF0000">Bilirubin</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Prothrombin</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Age</span> as compared to lower values
+    * Higher values for <span style="color: #FF0000">Copper</span> as compared to lower values
+10. SHAP values were computed for the significant predictors, with contributions to the model output ranked as follows:
+    * Higher values for <span style="color: #FF0000">Bilirubin</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Prothrombin</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Copper</span> result to the event expected to occur sooner
+    * Higher values for <span style="color: #FF0000">Age</span> result to the event expected to occur sooner
 
 
 ```python
@@ -9956,7 +10076,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 07:12:33 UTC</td>
+      <td>2024-08-02 01:14:27 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10392,7 +10512,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-01 07:12:35 UTC</td>
+      <td>2024-08-02 01:14:27 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -11000,7 +11120,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:47,  3.59it/s]                         
+    PermutationExplainer explainer: 219it [00:12,  3.25it/s]                         
     
 
 
