@@ -7609,16 +7609,64 @@ cirrhosis_survival_test_modeling.head()
 
 ```python
 ##################################
-# Comparing the quantiles between the 
-# the observed survival times
-# and theoretical Weibull distribution
+# Assessing the survival probability 
+# and hazard function plots
+# with a Weibull distribution
 ##################################
-cirrhosis_survival_weibull = WeibullFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
-plt.figure(figsize=(17, 8)) 
-qq_plot(cirrhosis_survival_weibull)
-plt.xlabel('Fitted Weibull Quantiles')
-plt.ylabel('Empirical Quantiles')
-plt.title('QQ Plot: AFT_WEIBULL')
+cirrhosis_survival_weibull = WeibullFitter()
+cirrhosis_survival_weibull.fit(durations=cirrhosis_survival_train_modeling['N_Days'], 
+                               event_observed=cirrhosis_survival_train_modeling['Status'])
+
+##################################
+# Fitting a Kaplan-Meier estimation
+##################################
+cirrhosis_survival_km = KaplanMeierFitter()
+cirrhosis_survival_km.fit(durations=cirrhosis_survival_train_modeling['N_Days'],
+                          event_observed=cirrhosis_survival_train_modeling['Status'])
+
+##################################
+# Generating the survival probability 
+# and hazard function plots
+##################################
+plt.figure(figsize=(17, 8))
+
+##################################
+# Generating the Kaplan-Meier
+# survival probability plot
+##################################
+plt.subplot(1, 3, 1)
+cirrhosis_survival_km.plot_survival_function()
+plt.title("Kaplan-Meier Survival Probability Curve")
+plt.xlabel("N_Days")
+plt.ylabel("Survival Probability")
+plt.legend('',frameon=False)
+
+##################################
+# Generating the Weibull
+# survival probability plot
+##################################
+plt.subplot(1, 3, 2)
+cirrhosis_survival_weibull.plot_survival_function()
+plt.title("Weibull Survival Probability Curve")
+plt.xlabel("N_Days")
+plt.ylabel("Survival Probability")
+plt.legend('',frameon=False)
+
+##################################
+# Generating the Weibull
+# hazard function plot
+##################################
+plt.subplot(1, 3, 3)
+cirrhosis_survival_weibull.plot_hazard()
+plt.title("Weibull Hazard Function")
+plt.xlabel("N_Days")
+plt.ylabel("Hazard")
+plt.legend('',frameon=False)
+
+##################################
+# Consolidating all plots
+##################################
+plt.tight_layout()
 plt.show()
 ```
 
@@ -7687,7 +7735,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-02 01:13:51 UTC</td>
+      <td>2024-08-03 08:04:42 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8123,7 +8171,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-02 01:13:51 UTC</td>
+      <td>2024-08-03 08:04:43 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8687,7 +8735,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:14,  5.03it/s]                         
+    PermutationExplainer explainer: 219it [00:27,  5.64it/s]                         
     
 
 
@@ -8761,16 +8809,64 @@ shap.summary_plot(shap_values_weibull,
 
 ```python
 ##################################
-# Comparing the quantiles between the 
-# the observed survival times
-# and theoretical Log-Normal distribution
+# Assessing the survival probability 
+# and hazard function plots
+# with a Log-Normal distribution
 ##################################
-cirrhosis_survival_lognormal = LogNormalFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
-plt.figure(figsize=(17, 8)) 
-qq_plot(cirrhosis_survival_lognormal, plot_kwargs={'marker': 'x', 'color': 'blue'})
-plt.xlabel('Fitted Log-Normal Quantiles')
-plt.ylabel('Empirical Quantiles')
-plt.title('QQ Plot: AFT_LOGNORMAL')
+cirrhosis_survival_lognormal = LogNormalFitter()
+cirrhosis_survival_lognormal.fit(durations=cirrhosis_survival_train_modeling['N_Days'], 
+                                 event_observed=cirrhosis_survival_train_modeling['Status'])
+
+##################################
+# Fitting a Kaplan-Meier estimation
+##################################
+cirrhosis_survival_km = KaplanMeierFitter()
+cirrhosis_survival_km.fit(durations=cirrhosis_survival_train_modeling['N_Days'],
+                          event_observed=cirrhosis_survival_train_modeling['Status'])
+
+##################################
+# Generating the survival probability 
+# and hazard function plots
+##################################
+plt.figure(figsize=(17, 8))
+
+##################################
+# Generating the Kaplan-Meier
+# survival probability plot
+##################################
+plt.subplot(1, 3, 1)
+cirrhosis_survival_km.plot_survival_function()
+plt.title("Kaplan-Meier Survival Probability Curve")
+plt.xlabel("N_Days")
+plt.ylabel("Survival Probability")
+plt.legend('',frameon=False)
+
+##################################
+# Generating the Weibull
+# survival probability plot
+##################################
+plt.subplot(1, 3, 2)
+cirrhosis_survival_lognormal.plot_survival_function()
+plt.title("Log-Normal Survival Probability Curve")
+plt.xlabel("N_Days")
+plt.ylabel("Survival Probability")
+plt.legend('',frameon=False)
+
+##################################
+# Generating the Weibull
+# hazard function plot
+##################################
+plt.subplot(1, 3, 3)
+cirrhosis_survival_lognormal.plot_hazard()
+plt.title("Log-Normal Hazard Function")
+plt.xlabel("N_Days")
+plt.ylabel("Hazard")
+plt.legend('',frameon=False)
+
+##################################
+# Consolidating all plots
+##################################
+plt.tight_layout()
 plt.show()
 ```
 
@@ -8839,7 +8935,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-02 01:14:09 UTC</td>
+      <td>2024-08-03 08:05:19 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9275,7 +9371,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-02 01:14:10 UTC</td>
+      <td>2024-08-03 08:05:20 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9927,7 +10023,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:12,  3.81it/s]                         
+    PermutationExplainer explainer: 219it [00:28,  4.95it/s]                         
     
 
 
@@ -9998,16 +10094,64 @@ shap.summary_plot(shap_values_lognormal,
 
 ```python
 ##################################
-# Comparing the quantiles between the 
-# the observed survival times
-# and theoretical Log-Logistic distribution
+# Assessing the survival probability 
+# and hazard function plots
+# with a Log-Logistic distribution
 ##################################
-cirrhosis_survival_loglogistic = LogLogisticFitter().fit(cirrhosis_survival_train_modeling['N_Days'], cirrhosis_survival_train_modeling['Status'])
-plt.figure(figsize=(17, 8)) 
-qq_plot(cirrhosis_survival_loglogistic, plot_kwargs={'marker': 'x', 'color': 'blue'})
-plt.xlabel('Fitted Log-Logistic Quantiles')
-plt.ylabel('Empirical Quantiles')
-plt.title('QQ Plot: AFT_LOGLOGISTIC')
+cirrhosis_survival_loglogistic = LogLogisticFitter()
+cirrhosis_survival_loglogistic.fit(durations=cirrhosis_survival_train_modeling['N_Days'], 
+                                   event_observed=cirrhosis_survival_train_modeling['Status'])
+
+##################################
+# Fitting a Kaplan-Meier estimation
+##################################
+cirrhosis_survival_km = KaplanMeierFitter()
+cirrhosis_survival_km.fit(durations=cirrhosis_survival_train_modeling['N_Days'],
+                          event_observed=cirrhosis_survival_train_modeling['Status'])
+
+##################################
+# Generating the survival probability 
+# and hazard function plots
+##################################
+plt.figure(figsize=(17, 8))
+
+##################################
+# Generating the Kaplan-Meier
+# survival probability plot
+##################################
+plt.subplot(1, 3, 1)
+cirrhosis_survival_km.plot_survival_function()
+plt.title("Kaplan-Meier Survival Probability Curve")
+plt.xlabel("N_Days")
+plt.ylabel("Survival Probability")
+plt.legend('',frameon=False)
+
+##################################
+# Generating the Log-Logistic
+# survival probability plot
+##################################
+plt.subplot(1, 3, 2)
+cirrhosis_survival_loglogistic.plot_survival_function()
+plt.title("Log-Logistic Survival Probability Curve")
+plt.xlabel("N_Days")
+plt.ylabel("Survival Probability")
+plt.legend('',frameon=False)
+
+##################################
+# Generating the log-Logistic
+# hazard function plot
+##################################
+plt.subplot(1, 3, 3)
+cirrhosis_survival_loglogistic.plot_hazard()
+plt.title("Log-Logistic Hazard Function")
+plt.xlabel("N_Days")
+plt.ylabel("Hazard")
+plt.legend('',frameon=False)
+
+##################################
+# Consolidating all plots
+##################################
+plt.tight_layout()
 plt.show()
 ```
 
@@ -10076,7 +10220,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-02 01:14:27 UTC</td>
+      <td>2024-08-03 08:06:02 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10512,7 +10656,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-02 01:14:27 UTC</td>
+      <td>2024-08-03 08:06:03 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -11120,7 +11264,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:12,  3.25it/s]                         
+    PermutationExplainer explainer: 219it [00:27,  5.14it/s]                         
     
 
 
@@ -11140,7 +11284,33 @@ shap.summary_plot(shap_values_loglogistic,
 
 ## 1.7. Consolidated Findings <a class="anchor" id="1.7"></a>
 
-
+1. In the context of accelerated failure time models, the choice of distribution is crucial as it impacts the estimation of survival times and the interpretation of covariate effects. Factors to consider include the nature of the data, the properties of the distributions, and the model fit.
+    * [Weibull distribution](https://lifelines.readthedocs.io/en/latest/fitters/regression/WeibullAFTFitter.html) is suitable for data where the hazard function is either monotonically increasing or decreasing. It can model both increasing hazard (positive shape parameter) and decreasing hazard (negative shape parameter).
+    * [Log-Normal distribution](https://lifelines.readthedocs.io/en/latest/fitters/regression/LogNormalAFTFitter.html) is appropriate when the logarithm of the survival times follows a normal distribution. It is useful for data where the hazard rate initially increases and then decreases.
+    * [Log-Logistic distribution](https://lifelines.readthedocs.io/en/latest/fitters/regression/LogLogisticAFTFitter.html) is suitable when the hazard function initially increases and then decreases. It can accommodate both heavy-tailed distributions and distributions with a decreasing hazard rate at larger time values. 
+2. Several metrics are available for evaluating the performance of accelerated failure time models, each with strengths and weaknesses.
+    * [Concordance index](https://lifelines.readthedocs.io/en/latest/lifelines.utils.html) provides a measure of discriminative ability and useful for ranking predictions. However, it does not provide information on the magnitude of errors and may be insensitive to the calibration of predicted survival probabilities.
+    * [Mean absolute error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html) is intuitive and easy to interpret while providing a direct measure of prediction accuracy. However, it may be sensitive to outliers and does not consider the probabilistic nature of survival predictions.
+    * [Brier score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html) considers both discrimination and calibration, while reflecting the accuracy of predicted survival probabilities. However, it requires specifying a time point and aggregating scores over time points may be less interpretable.
+3. Comparing all results from the accelerated failure time models formulated, the most viable model for prediction using the MAE metric was determined as:
+    * [Weibull distribution](https://lifelines.readthedocs.io/en/latest/fitters/regression/WeibullAFTFitter.html)
+        * Supports a monotonically increasing hazard function which may be more applicable for modeling cirrhosis survival
+        * Demonstrated one of the best independent cross-validated (**MAE** = 2303.605628) and test (**MAE** = 1948.873380) model performance 
+        * Showed minimal overfit between the train (**MAE** = 2280.743783) and cross-validated (**MAE** = 2303.605628) model performance
+        * Selected a sufficient number of predictors (3 out of 17)
+        * Identified a sufficient number of statistically significant predictors (3 out of 17)
+            * <span style="color: #FF0000">Bilirubin</span>: Increase in value associated with a decrease in time to event 
+            * <span style="color: #FF0000">Prothrombin</span>: Increase in value associated with a decrease in time to event 
+            * <span style="color: #FF0000">Age</span>: Increase in value associated with a decrease in time to event 
+        * Survival probability curves estimated for all cases. Shorter median survival times were observed for:
+            * Event cases as compared to censored cases
+            * Higher values for <span style="color: #FF0000">Bilirubin</span> as compared to lower values
+            * Higher values for <span style="color: #FF0000">Prothrombin</span> as compared to lower values
+            * Higher values for <span style="color: #FF0000">Age</span> as compared to lower values
+        * Obtained **SHAP values** provided an insightful and clear indication of each predictor's impact on the prediction, independent of the penalization
+            * Higher values for <span style="color: #FF0000">Bilirubin</span> result to the event expected to occur sooner
+            * Higher values for <span style="color: #FF0000">Prothrombin</span> result to the event expected to occur sooner
+            * Higher values for <span style="color: #FF0000">Age</span> result to the event expected to occur sooner
 
 
 ```python
