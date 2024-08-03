@@ -7735,7 +7735,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 08:04:42 UTC</td>
+      <td>2024-08-03 13:20:29 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8171,7 +8171,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 08:04:43 UTC</td>
+      <td>2024-08-03 13:20:30 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8735,7 +8735,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:27,  5.64it/s]                         
+    PermutationExplainer explainer: 219it [00:41,  4.52it/s]                         
     
 
 
@@ -8935,7 +8935,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 08:05:19 UTC</td>
+      <td>2024-08-03 13:21:25 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9371,7 +9371,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 08:05:20 UTC</td>
+      <td>2024-08-03 13:21:26 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10023,7 +10023,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:28,  4.95it/s]                         
+    PermutationExplainer explainer: 219it [00:35,  4.40it/s]                         
     
 
 
@@ -10220,7 +10220,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 08:06:02 UTC</td>
+      <td>2024-08-03 13:22:18 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10656,7 +10656,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 08:06:03 UTC</td>
+      <td>2024-08-03 13:22:19 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -11264,7 +11264,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:27,  5.14it/s]                         
+    PermutationExplainer explainer: 219it [00:36,  4.32it/s]                         
     
 
 
@@ -11294,11 +11294,11 @@ shap.summary_plot(shap_values_loglogistic,
     * [Brier score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html) considers both discrimination and calibration, while reflecting the accuracy of predicted survival probabilities. However, it requires specifying a time point and aggregating scores over time points may be less interpretable.
 3. Comparing all results from the accelerated failure time models formulated, the most viable model for prediction using the MAE metric was determined as:
     * [Weibull distribution](https://lifelines.readthedocs.io/en/latest/fitters/regression/WeibullAFTFitter.html)
-        * Supports a monotonically increasing hazard function which may be more applicable for modeling cirrhosis survival
+        * Supports a monotonically increasing hazard function which may be more suitable for modeling cirrhosis survival
         * Demonstrated one of the best independent cross-validated (**MAE** = 2303.605628) and test (**MAE** = 1948.873380) model performance 
         * Showed minimal overfit between the train (**MAE** = 2280.743783) and cross-validated (**MAE** = 2303.605628) model performance
         * Selected a sufficient number of predictors (3 out of 17)
-        * Identified a sufficient number of statistically significant predictors (3 out of 17)
+        * Identified a sufficient number of statistically significant predictors (3 out of 17):
             * <span style="color: #FF0000">Bilirubin</span>: Increase in value associated with a decrease in time to event 
             * <span style="color: #FF0000">Prothrombin</span>: Increase in value associated with a decrease in time to event 
             * <span style="color: #FF0000">Age</span>: Increase in value associated with a decrease in time to event 
@@ -11307,7 +11307,7 @@ shap.summary_plot(shap_values_loglogistic,
             * Higher values for <span style="color: #FF0000">Bilirubin</span> as compared to lower values
             * Higher values for <span style="color: #FF0000">Prothrombin</span> as compared to lower values
             * Higher values for <span style="color: #FF0000">Age</span> as compared to lower values
-        * Obtained **SHAP values** provided an insightful and clear indication of each predictor's impact on the prediction, independent of the penalization
+        * Obtained **SHAP values** provided an insightful and clear indication of each significant predictor's impact on the lifetime prediction:
             * Higher values for <span style="color: #FF0000">Bilirubin</span> result to the event expected to occur sooner
             * Higher values for <span style="color: #FF0000">Prothrombin</span> result to the event expected to occur sooner
             * Higher values for <span style="color: #FF0000">Age</span> result to the event expected to occur sooner
@@ -11878,6 +11878,8 @@ for container in brier_score_plot.containers:
 
 
 # 2. Summary <a class="anchor" id="Summary"></a>
+
+![Project53_Summary.png](attachment:cc94b584-a313-429b-af96-ab99889a70f5.png)
 
 # 3. References <a class="anchor" id="References"></a>
 
