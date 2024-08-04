@@ -7735,7 +7735,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 13:20:29 UTC</td>
+      <td>2024-08-04 04:04:20 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8171,7 +8171,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 13:20:30 UTC</td>
+      <td>2024-08-04 04:04:20 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8735,7 +8735,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:41,  4.52it/s]                         
+    PermutationExplainer explainer: 219it [00:28,  5.58it/s]                         
     
 
 
@@ -8935,7 +8935,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 13:21:25 UTC</td>
+      <td>2024-08-04 04:04:53 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9371,7 +9371,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 13:21:26 UTC</td>
+      <td>2024-08-04 04:04:54 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10023,7 +10023,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:35,  4.40it/s]                         
+    PermutationExplainer explainer: 219it [00:13,  3.94it/s]                         
     
 
 
@@ -10220,7 +10220,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 13:22:18 UTC</td>
+      <td>2024-08-04 04:05:14 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10656,7 +10656,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-03 13:22:19 UTC</td>
+      <td>2024-08-04 04:05:14 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -11264,7 +11264,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:36,  4.32it/s]                         
+    PermutationExplainer explainer: 219it [00:15,  4.10it/s]                         
     
 
 
@@ -11879,7 +11879,7 @@ for container in brier_score_plot.containers:
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
-![Project53_Summary.png](attachment:cc94b584-a313-429b-af96-ab99889a70f5.png)
+![Project53_Summary.png](attachment:9c73b63a-841a-40e1-9179-83b28e2cc386.png)
 
 # 3. References <a class="anchor" id="References"></a>
 
