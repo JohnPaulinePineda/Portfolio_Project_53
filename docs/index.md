@@ -4899,7 +4899,7 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
              * <span style="color: #FF0000">Triglycerides</span>
              * <span style="color: #FF0000">Platelets</span>
              * <span style="color: #FF0000">Prothrombin</span>
-        * **10/21 predictor** (object)
+        * **10/22 predictor** (object)
              * <span style="color: #FF0000">Drug</span>
              * <span style="color: #FF0000">Sex</span>
              * <span style="color: #FF0000">Ascites</span>
@@ -4927,7 +4927,7 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
              * <span style="color: #FF0000">Triglycerides</span>
              * <span style="color: #FF0000">Platelets</span>
              * <span style="color: #FF0000">Prothrombin</span>
-        * **10/21 predictor** (object)
+        * **10/22 predictor** (object)
              * <span style="color: #FF0000">Drug</span>
              * <span style="color: #FF0000">Sex</span>
              * <span style="color: #FF0000">Ascites</span>
@@ -6584,16 +6584,16 @@ plt.show()
     * **Null**: Difference in the means between groups True and False is equal to zero  
     * **Alternative**: Difference in the means between groups True and False is not equal to zero   
 2. There is sufficient evidence to conclude of a statistically significant difference between the means of the numeric measurements obtained from the <span style="color: #FF0000">Status</span> groups in 10 numeric predictors given their high t-test statistic values with reported low p-values less than the significance level of 0.05.
-    * <span style="color: #FF0000">Bilirubin</span>: T.Test.Statistic=-8.031, Correlation.PValue=0.000
-    * <span style="color: #FF0000">Prothrombin</span>: T.Test.Statistic=-7.062, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">Copper</span>: T.Test.Statistic=-5.699, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">Alk_Phos</span>: T.Test.Statistic=-4.638, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">SGOT</span>: T.Test.Statistic=-4.207, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">Albumin</span>: T.Test.Statistic=+3.871, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">Tryglicerides</span>: T.Test.Statistic=-3.575, Correlation.PValue=0.000   
-    * <span style="color: #FF0000">Age</span>: T.Test.Statistic=-3.264, Correlation.PValue=0.001
-    * <span style="color: #FF0000">Platelets</span>: T.Test.Statistic=+3.261, Correlation.PValue=0.001
-    * <span style="color: #FF0000">Cholesterol</span>: T.Test.Statistic=-2.256, Correlation.PValue=0.025
+    * <span style="color: #FF0000">Bilirubin</span>: T.Test.Statistic=-8.031, T.Test.PValue=0.000
+    * <span style="color: #FF0000">Prothrombin</span>: T.Test.Statistic=-7.062, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">Copper</span>: T.Test.Statistic=-5.699, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">Alk_Phos</span>: T.Test.Statistic=-4.638, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">SGOT</span>: T.Test.Statistic=-4.207, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">Albumin</span>: T.Test.Statistic=+3.871, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">Tryglicerides</span>: T.Test.Statistic=-3.575, T.Test.PValue=0.000   
+    * <span style="color: #FF0000">Age</span>: T.Test.Statistic=-3.264, T.Test.PValue=0.001
+    * <span style="color: #FF0000">Platelets</span>: T.Test.Statistic=+3.261, T.Test.PValue=0.001
+    * <span style="color: #FF0000">Cholesterol</span>: T.Test.Statistic=-2.256, T.Test.PValue=0.025
 3. The relationship between the object predictors to the <span style="color: #FF0000">Status</span> event variable was statistically evaluated using the following hypotheses:
     * **Null**: The object predictor is independent of the event variable 
     * **Alternative**: The object predictor is dependent on the event variable   
@@ -7735,7 +7735,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-04 04:04:20 UTC</td>
+      <td>2024-08-17 00:55:51 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8171,7 +8171,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-04 04:04:20 UTC</td>
+      <td>2024-08-17 00:55:52 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8735,7 +8735,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:28,  5.58it/s]                         
+    PermutationExplainer explainer: 219it [00:27,  5.91it/s]                         
     
 
 
@@ -8935,7 +8935,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-04 04:04:53 UTC</td>
+      <td>2024-08-17 00:56:28 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9371,7 +9371,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-04 04:04:54 UTC</td>
+      <td>2024-08-17 00:56:29 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10023,7 +10023,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:13,  3.94it/s]                         
+    PermutationExplainer explainer: 219it [00:22,  5.42it/s]                         
     
 
 
@@ -10220,7 +10220,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-04 04:05:14 UTC</td>
+      <td>2024-08-17 00:57:02 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10656,7 +10656,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-04 04:05:14 UTC</td>
+      <td>2024-08-17 00:57:03 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -11264,7 +11264,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:15,  4.10it/s]                         
+    PermutationExplainer explainer: 219it [00:22,  5.27it/s]                         
     
 
 
