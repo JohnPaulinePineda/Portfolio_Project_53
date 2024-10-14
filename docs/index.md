@@ -2,7 +2,7 @@
 # Supervised Learning : Exploring Parametric Accelerated Failure Time Models for Estimating Lifetimes in Survival Data
 
 ***
-### John Pauline Pineda <br> <br> *August 3, 2024*
+### [**John Pauline Pineda**](https://github.com/JohnPaulinePineda) <br> <br> *August 3, 2024*
 ***
 
 * [**1. Table of Contents**](#TOC)
@@ -115,6 +115,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import itertools
+import os
 %matplotlib inline
 
 from operator import add,mul,truediv
@@ -153,9 +154,18 @@ warnings.filterwarnings('ignore')
 
 ```python
 ##################################
-# Loading the dataset
+# Defining file paths
 ##################################
-cirrhosis_survival = pd.read_csv('Cirrhosis_Survival.csv')
+DATASETS_ORIGINAL_PATH = r"datasets\original"
+```
+
+
+```python
+##################################
+# Loading the dataset
+# from the DATASETS_ORIGINAL_PATH
+##################################
+cirrhosis_survival = pd.read_csv(os.path.join("..", DATASETS_ORIGINAL_PATH, "Cirrhosis_Survival.csv"))
 ```
 
 
@@ -3939,61 +3949,61 @@ for column in cirrhosis_survival_X_train_imputed_numeric:
 
 
     
-![png](output_99_0.png)
+![png](output_100_0.png)
     
 
 
 
     
-![png](output_99_1.png)
+![png](output_100_1.png)
     
 
 
 
     
-![png](output_99_2.png)
+![png](output_100_2.png)
     
 
 
 
     
-![png](output_99_3.png)
+![png](output_100_3.png)
     
 
 
 
     
-![png](output_99_4.png)
+![png](output_100_4.png)
     
 
 
 
     
-![png](output_99_5.png)
+![png](output_100_5.png)
     
 
 
 
     
-![png](output_99_6.png)
+![png](output_100_6.png)
     
 
 
 
     
-![png](output_99_7.png)
+![png](output_100_7.png)
     
 
 
 
     
-![png](output_99_8.png)
+![png](output_100_8.png)
     
 
 
 
     
-![png](output_99_9.png)
+![png](output_100_9.png)
     
 
 
@@ -4202,7 +4212,7 @@ plt.show()
 
 
     
-![png](output_104_0.png)
+![png](output_105_0.png)
     
 
 
@@ -4239,7 +4249,7 @@ plot_correlation_matrix(cirrhosis_survival_X_train_imputed_numeric_correlation,m
 
 
     
-![png](output_106_0.png)
+![png](output_107_0.png)
     
 
 
@@ -4377,7 +4387,7 @@ cirrhosis_survival_X_train_transformed_numeric.head()
       <th>3</th>
       <td>17884</td>
       <td>0.760957</td>
-      <td>1.505628</td>
+      <td>1.505627</td>
       <td>30.818146</td>
       <td>5.264915</td>
       <td>2.062590</td>
@@ -4395,7 +4405,7 @@ cirrhosis_survival_X_train_transformed_numeric.head()
       <td>6.440904</td>
       <td>2.109170</td>
       <td>8.385199</td>
-      <td>3.284118</td>
+      <td>3.284119</td>
       <td>43.198326</td>
       <td>0.236572</td>
     </tr>
@@ -4418,61 +4428,61 @@ for column in cirrhosis_survival_X_train_transformed_numeric:
 
 
     
-![png](output_112_0.png)
+![png](output_113_0.png)
     
 
 
 
     
-![png](output_112_1.png)
+![png](output_113_1.png)
     
 
 
 
     
-![png](output_112_2.png)
+![png](output_113_2.png)
     
 
 
 
     
-![png](output_112_3.png)
+![png](output_113_3.png)
     
 
 
 
     
-![png](output_112_4.png)
+![png](output_113_4.png)
     
 
 
 
     
-![png](output_112_5.png)
+![png](output_113_5.png)
     
 
 
 
     
-![png](output_112_6.png)
+![png](output_113_6.png)
     
 
 
 
     
-![png](output_112_7.png)
+![png](output_113_7.png)
     
 
 
 
     
-![png](output_112_8.png)
+![png](output_113_8.png)
     
 
 
 
     
-![png](output_112_9.png)
+![png](output_113_9.png)
     
 
 
@@ -4655,61 +4665,61 @@ for column in cirrhosis_survival_X_train_scaled_numeric:
 
 
     
-![png](output_117_0.png)
+![png](output_118_0.png)
     
 
 
 
     
-![png](output_117_1.png)
+![png](output_118_1.png)
     
 
 
 
     
-![png](output_117_2.png)
+![png](output_118_2.png)
     
 
 
 
     
-![png](output_117_3.png)
+![png](output_118_3.png)
     
 
 
 
     
-![png](output_117_4.png)
+![png](output_118_4.png)
     
 
 
 
     
-![png](output_117_5.png)
+![png](output_118_5.png)
     
 
 
 
     
-![png](output_117_6.png)
+![png](output_118_6.png)
     
 
 
 
     
-![png](output_117_7.png)
+![png](output_118_7.png)
     
 
 
 
     
-![png](output_117_8.png)
+![png](output_118_8.png)
     
 
 
 
     
-![png](output_117_9.png)
+![png](output_118_9.png)
     
 
 
@@ -4816,10 +4826,10 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -4829,10 +4839,10 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
@@ -4842,10 +4852,10 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
@@ -4855,10 +4865,10 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>4</th>
@@ -4868,10 +4878,10 @@ cirrhosis_survival_X_train_cleaned_encoded_object.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -5014,10 +5024,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -5037,10 +5047,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
@@ -5060,10 +5070,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
@@ -5083,10 +5093,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>4</th>
@@ -5106,10 +5116,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -5420,10 +5430,10 @@ cirrhosis_survival_X_train_object_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -5433,10 +5443,10 @@ cirrhosis_survival_X_train_object_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
@@ -5446,10 +5456,10 @@ cirrhosis_survival_X_train_object_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
@@ -5459,10 +5469,10 @@ cirrhosis_survival_X_train_object_preprocessed.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>4</th>
@@ -5472,10 +5482,10 @@ cirrhosis_survival_X_train_object_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -5556,10 +5566,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -5579,10 +5589,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
@@ -5602,10 +5612,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
@@ -5625,10 +5635,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>4</th>
@@ -5648,10 +5658,10 @@ cirrhosis_survival_X_train_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -5957,10 +5967,10 @@ cirrhosis_survival_X_test_object_preprocessed.head()
       <td>0</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -5970,10 +5980,10 @@ cirrhosis_survival_X_test_object_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>2</th>
@@ -5983,10 +5993,10 @@ cirrhosis_survival_X_test_object_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>3</th>
@@ -5996,10 +6006,10 @@ cirrhosis_survival_X_test_object_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>4</th>
@@ -6009,10 +6019,10 @@ cirrhosis_survival_X_test_object_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -6093,10 +6103,10 @@ cirrhosis_survival_X_test_preprocessed.head()
       <td>0</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -6116,10 +6126,10 @@ cirrhosis_survival_X_test_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>2</th>
@@ -6139,10 +6149,10 @@ cirrhosis_survival_X_test_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>3</th>
@@ -6162,10 +6172,10 @@ cirrhosis_survival_X_test_preprocessed.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>4</th>
@@ -6185,10 +6195,10 @@ cirrhosis_survival_X_test_preprocessed.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -6330,10 +6340,10 @@ cirrhosis_survival_train_EDA.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -6354,10 +6364,10 @@ cirrhosis_survival_train_EDA.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
@@ -6378,10 +6388,10 @@ cirrhosis_survival_train_EDA.head()
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
@@ -6402,10 +6412,10 @@ cirrhosis_survival_train_EDA.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>4</th>
@@ -6426,10 +6436,10 @@ cirrhosis_survival_train_EDA.head()
       <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -6471,7 +6481,7 @@ plt.show()
 
 
     
-![png](output_140_0.png)
+![png](output_141_0.png)
     
 
 
@@ -6505,7 +6515,7 @@ plt.show()
 
 
     
-![png](output_142_0.png)
+![png](output_143_0.png)
     
 
 
@@ -6528,7 +6538,7 @@ plt.show()
 
 
     
-![png](output_143_0.png)
+![png](output_144_0.png)
     
 
 
@@ -6552,7 +6562,7 @@ plt.show()
 
 
     
-![png](output_144_0.png)
+![png](output_145_0.png)
     
 
 
@@ -6574,7 +6584,7 @@ plt.show()
 
 
     
-![png](output_145_0.png)
+![png](output_146_0.png)
     
 
 
@@ -6872,7 +6882,7 @@ plt.show()
 
 
     
-![png](output_151_0.png)
+![png](output_152_0.png)
     
 
 
@@ -7040,7 +7050,7 @@ plt.show()
 
 
     
-![png](output_155_0.png)
+![png](output_156_0.png)
     
 
 
@@ -7222,6 +7232,7 @@ cirrhosis_survival_train_modeling = pd.concat([cirrhosis_survival_y_train_cleane
                                                cirrhosis_survival_X_train_preprocessed],
                                               axis=1)
 cirrhosis_survival_train_modeling.drop(columns=['Stage_1.0', 'Stage_2.0', 'Stage_3.0'], axis=1, inplace=True)
+cirrhosis_survival_train_modeling['Stage_4.0'] = cirrhosis_survival_train_modeling['Stage_4.0'].replace({True: 1, False: 0})
 cirrhosis_survival_train_modeling.head()
 ```
 
@@ -7395,6 +7406,7 @@ cirrhosis_survival_test_modeling = pd.concat([cirrhosis_survival_y_test_cleaned,
                                                cirrhosis_survival_X_test_preprocessed],
                                               axis=1)
 cirrhosis_survival_test_modeling.drop(columns=['Stage_1.0', 'Stage_2.0', 'Stage_3.0'], axis=1, inplace=True)
+cirrhosis_survival_test_modeling['Stage_4.0'] = cirrhosis_survival_test_modeling['Stage_4.0'].replace({True: 1, False: 0})
 cirrhosis_survival_test_modeling.head()
 ```
 
@@ -7672,7 +7684,7 @@ plt.show()
 
 
     
-![png](output_162_0.png)
+![png](output_163_0.png)
     
 
 
@@ -7735,7 +7747,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-17 00:55:51 UTC</td>
+      <td>2024-10-14 07:41:30 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8092,7 +8104,7 @@ plt.show()
 
 
     
-![png](output_164_0.png)
+![png](output_165_0.png)
     
 
 
@@ -8171,7 +8183,7 @@ cirrhosis_survival_aft_weibull.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-17 00:55:52 UTC</td>
+      <td>2024-10-14 07:41:31 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -8333,7 +8345,7 @@ plt.show()
 
 
     
-![png](output_167_0.png)
+![png](output_168_0.png)
     
 
 
@@ -8363,7 +8375,7 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_train_brier}")
 
 
 
-    'Apparent MAE: 2280.743783352583'
+    'Apparent MAE: 2280.743783352582'
 
 
 
@@ -8412,11 +8424,11 @@ display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_weibull_cv_brier_
 
 
 
-    'Cross-Validated MAE: 2303.6056275460082'
+    'Cross-Validated MAE: 2303.605627546008'
 
 
 
-    'Cross-Validated Brier Score: 0.5125825238516043'
+    'Cross-Validated Brier Score: 0.5125825238516044'
 
 
 
@@ -8444,11 +8456,11 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_weibull_test_brier}")
 
 
 
-    'Apparent MAE: 1948.87338022389'
+    'Apparent MAE: 1948.8733802238894'
 
 
 
-    'Apparent Brier Score: 0.5375559341601057'
+    'Apparent Brier Score: 0.5375559341601058'
 
 
 
@@ -8596,7 +8608,7 @@ plt.show()
 
 
     
-![png](output_172_0.png)
+![png](output_173_0.png)
     
 
 
@@ -8623,7 +8635,7 @@ plt.show()
 
 
     
-![png](output_173_0.png)
+![png](output_174_0.png)
     
 
 
@@ -8653,7 +8665,7 @@ plt.show()
 
 
     
-![png](output_174_0.png)
+![png](output_175_0.png)
     
 
 
@@ -8683,7 +8695,7 @@ plt.show()
 
 
     
-![png](output_175_0.png)
+![png](output_176_0.png)
     
 
 
@@ -8713,7 +8725,7 @@ plt.show()
 
 
     
-![png](output_176_0.png)
+![png](output_177_0.png)
     
 
 
@@ -8735,7 +8747,7 @@ explainer_weibull = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_aft_
 shap_values_weibull = explainer_weibull(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:27,  5.91it/s]                         
+    PermutationExplainer explainer: 219it [00:25,  5.70it/s]                              
     
 
 
@@ -8749,7 +8761,7 @@ shap.summary_plot(shap_values_weibull,
 
 
     
-![png](output_178_0.png)
+![png](output_179_0.png)
     
 
 
@@ -8872,7 +8884,7 @@ plt.show()
 
 
     
-![png](output_180_0.png)
+![png](output_181_0.png)
     
 
 
@@ -8935,7 +8947,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-17 00:56:28 UTC</td>
+      <td>2024-10-14 07:42:04 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9292,7 +9304,7 @@ plt.show()
 
 
     
-![png](output_182_0.png)
+![png](output_183_0.png)
     
 
 
@@ -9371,7 +9383,7 @@ cirrhosis_survival_aft_lognormal.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-17 00:56:29 UTC</td>
+      <td>2024-10-14 07:42:05 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -9561,7 +9573,7 @@ plt.show()
 
 
     
-![png](output_185_0.png)
+![png](output_186_0.png)
     
 
 
@@ -9591,11 +9603,11 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_lognormal_train_brier}")
 
 
 
-    'Apparent MAE: 2518.3593852441504'
+    'Apparent MAE: 2518.3593852441572'
 
 
 
-    'Apparent Brier Score: 0.5470406779352225'
+    'Apparent Brier Score: 0.5470406779352227'
 
 
 
@@ -9825,7 +9837,7 @@ plt.show()
 
 
     
-![png](output_190_0.png)
+![png](output_191_0.png)
     
 
 
@@ -9852,7 +9864,7 @@ plt.show()
 
 
     
-![png](output_191_0.png)
+![png](output_192_0.png)
     
 
 
@@ -9880,7 +9892,7 @@ plt.show()
 
 
     
-![png](output_192_0.png)
+![png](output_193_0.png)
     
 
 
@@ -9910,7 +9922,7 @@ plt.show()
 
 
     
-![png](output_193_0.png)
+![png](output_194_0.png)
     
 
 
@@ -9940,7 +9952,7 @@ plt.show()
 
 
     
-![png](output_194_0.png)
+![png](output_195_0.png)
     
 
 
@@ -9970,7 +9982,7 @@ plt.show()
 
 
     
-![png](output_195_0.png)
+![png](output_196_0.png)
     
 
 
@@ -10000,7 +10012,7 @@ plt.show()
 
 
     
-![png](output_196_0.png)
+![png](output_197_0.png)
     
 
 
@@ -10023,7 +10035,7 @@ shap_values_lognormal = explainer_lognormal(cirrhosis_survival_train_modeling.il
 
 ```
 
-    PermutationExplainer explainer: 219it [00:22,  5.42it/s]                         
+    PermutationExplainer explainer: 219it [00:21,  5.49it/s]                              
     
 
 
@@ -10037,7 +10049,7 @@ shap.summary_plot(shap_values_lognormal,
 
 
     
-![png](output_198_0.png)
+![png](output_199_0.png)
     
 
 
@@ -10157,7 +10169,7 @@ plt.show()
 
 
     
-![png](output_200_0.png)
+![png](output_201_0.png)
     
 
 
@@ -10220,7 +10232,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-17 00:57:02 UTC</td>
+      <td>2024-10-14 07:42:37 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10577,7 +10589,7 @@ plt.show()
 
 
     
-![png](output_202_0.png)
+![png](output_203_0.png)
     
 
 
@@ -10656,7 +10668,7 @@ cirrhosis_survival_aft_loglogistic.print_summary()
     </tr>
     <tr>
       <th>time fit was run</th>
-      <td>2024-08-17 00:57:03 UTC</td>
+      <td>2024-10-14 07:42:37 UTC</td>
     </tr>
   </tbody>
 </table>
@@ -10832,7 +10844,7 @@ plt.show()
 
 
     
-![png](output_205_0.png)
+![png](output_206_0.png)
     
 
 
@@ -10862,7 +10874,7 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_train_brier}
 
 
 
-    'Apparent MAE: 2727.465086218323'
+    'Apparent MAE: 2727.4650862183294'
 
 
 
@@ -10911,11 +10923,11 @@ display(f"Cross-Validated Brier Score: {cirrhosis_survival_aft_loglogistic_cv_br
 
 
 
-    'Cross-Validated MAE: 2711.660486031347'
+    'Cross-Validated MAE: 2711.6604860313473'
 
 
 
-    'Cross-Validated Brier Score: 0.5065381245204558'
+    'Cross-Validated Brier Score: 0.5065381245204559'
 
 
 
@@ -10943,11 +10955,11 @@ display(f"Apparent Brier Score: {cirrhosis_survival_aft_loglogistic_test_brier}"
 
 
 
-    'Apparent MAE: 2189.9323142397434'
+    'Apparent MAE: 2189.9323142397443'
 
 
 
-    'Apparent Brier Score: 0.5332955064077312'
+    'Apparent Brier Score: 0.5332955064077313'
 
 
 
@@ -11095,7 +11107,7 @@ plt.show()
 
 
     
-![png](output_210_0.png)
+![png](output_211_0.png)
     
 
 
@@ -11122,7 +11134,7 @@ plt.show()
 
 
     
-![png](output_211_0.png)
+![png](output_212_0.png)
     
 
 
@@ -11152,7 +11164,7 @@ plt.show()
 
 
     
-![png](output_212_0.png)
+![png](output_213_0.png)
     
 
 
@@ -11182,7 +11194,7 @@ plt.show()
 
 
     
-![png](output_213_0.png)
+![png](output_214_0.png)
     
 
 
@@ -11212,7 +11224,7 @@ plt.show()
 
 
     
-![png](output_214_0.png)
+![png](output_215_0.png)
     
 
 
@@ -11242,7 +11254,7 @@ plt.show()
 
 
     
-![png](output_215_0.png)
+![png](output_216_0.png)
     
 
 
@@ -11264,7 +11276,7 @@ explainer_loglogistic = shap.Explainer(lambda x: aft_predict(cirrhosis_survival_
 shap_values_loglogistic = explainer_loglogistic(cirrhosis_survival_train_modeling.iloc[:, 2:])
 ```
 
-    PermutationExplainer explainer: 219it [00:22,  5.27it/s]                         
+    PermutationExplainer explainer: 219it [00:23,  5.45it/s]                              
     
 
 
@@ -11278,7 +11290,7 @@ shap.summary_plot(shap_values_loglogistic,
 
 
     
-![png](output_217_0.png)
+![png](output_218_0.png)
     
 
 
@@ -11655,7 +11667,7 @@ for container in ci_plot.containers:
 
 
     
-![png](output_222_0.png)
+![png](output_223_0.png)
     
 
 
@@ -11764,7 +11776,7 @@ for container in mae_plot.containers:
 
 
     
-![png](output_225_0.png)
+![png](output_226_0.png)
     
 
 
@@ -11873,13 +11885,13 @@ for container in brier_score_plot.containers:
 
 
     
-![png](output_228_0.png)
+![png](output_229_0.png)
     
 
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
-![Project53_Summary.png](attachment:9c73b63a-841a-40e1-9179-83b28e2cc386.png)
+![Project53_Summary.png](e16ae1f9-08e5-403c-b7cf-a3271ae3275f.png)
 
 # 3. References <a class="anchor" id="References"></a>
 
